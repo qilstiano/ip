@@ -68,6 +68,12 @@ class Event extends Task {
     }
 }
 
+class EinsteinException extends Exception {
+    public EinsteinException(String message) {
+        super(message);
+    }
+}
+
 public class Einstein {
     public String chatbotAscii;
     public String chatbotName = "Einstein";
@@ -171,62 +177,97 @@ public class Einstein {
             System.out.print("> ");
             String userInput = scanner.nextLine().trim();
 
-            if (userInput.equalsIgnoreCase("bye")) {
-                farewell();
-                break;
-            
-            } else if (userInput.equalsIgnoreCase("list")) {
-                listTasks();
-            
-            } else if (userInput.startsWith("mark ")) {
-                try {
-                    int taskIndex = Integer.parseInt(userInput.substring(5).trim()) - 1;
-                    markTaskAsDone(taskIndex);
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid task number!");
-                }
+            try {
+                if (userInput.equalsIgnoreCase("bye")) {
+                    farewell();
+                    break;
 
-            } else if (userInput.startsWith("unmark ")) {
-                try {
-                    int taskIndex = Integer.parseInt(userInput.substring(7).trim()) - 1;
-                    markTaskAsNotDone(taskIndex);
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid task number!");
-                }
+                } else if (userInput.equalsIgnoreCase("list")) {
+                    listTasks();
 
-            } else if (userInput.startsWith("todo ")) {
-                String description = userInput.substring(5).trim();
-                addTask(new Todo(description));
+                } else if (userInput.startsWith("mark ")) {
+                    handleMarkCommand(userInput);
 
-            } else if (userInput.startsWith("deadline ")) {
-                String[] parts = userInput.substring(9).split("/by", 2);
-                
-                if (parts.length == 2) {
-                    String description = parts[0].trim();
-                    String by = parts[1].trim();
-                    addTask(new Deadline(description, by));
-                
+                } else if (userInput.startsWith("unmark ")) {
+                    handleUnmarkCommand(userInput);
+
+                } else if (userInput.startsWith("todo ")) {
+                    handleTodoCommand(userInput);
+
+                } else if (userInput.startsWith("deadline ")) {
+                    handleDeadlineCommand(userInput);
+
+                } else if (userInput.startsWith("event ")) {
+                    handleEventCommand(userInput);
+
                 } else {
-                    System.out.println("Invalid deadline format! Use: deadline <description> /by <date>");
+                    throw new EinsteinException("ARGH! I do not understand you, which is weird, \nbecause I usually understand most things. Invalid command!");
                 }
-            
-            } else if (userInput.startsWith("event ")) {
-                String[] parts = userInput.substring(6).split("/from|/to", 3);
-                
-                if (parts.length == 3) {
-                    String description = parts[0].trim();
-                    String from = parts[1].trim();
-                    String to = parts[2].trim();
-                    addTask(new Event(description, from, to));
-                } else {
-                    System.out.println("Invalid event format! Use: event <description> /from <start> /to <end>");
-                }
-            
-            } else {
-                System.out.println("Invalid command!");
+
+            } catch (EinsteinException e) {
+                System.out.println("____________________________________________________________");
+                System.out.println(e.getMessage());
+                System.out.println("____________________________________________________________");
+            } catch (NumberFormatException e) {
+                System.out.println("____________________________________________________________");
+                System.out.println("Invalid task number! Please give me something valid!");
+                System.out.println("____________________________________________________________");
             }
         }
         scanner.close();
+    }
+
+    private void handleMarkCommand(String userInput) throws EinsteinException {
+        try {
+            int taskIndex = Integer.parseInt(userInput.substring(5).trim()) - 1;
+            if (taskIndex < 0 || taskIndex >= taskCount) {
+                throw new EinsteinException("Invalid task number! Please give me something valid!");
+            }
+            markTaskAsDone(taskIndex);
+        } catch (NumberFormatException e) {
+            throw new EinsteinException("Invalid task number! Please give me something valid!");
+        }
+    }
+
+    private void handleUnmarkCommand(String userInput) throws EinsteinException {
+        try {
+            int taskIndex = Integer.parseInt(userInput.substring(7).trim()) - 1;
+            if (taskIndex < 0 || taskIndex >= taskCount) {
+                throw new EinsteinException("Invalid task number! Please give me something valid!");
+            }
+            markTaskAsNotDone(taskIndex);
+        } catch (NumberFormatException e) {
+            throw new EinsteinException("Invalid task number! Please give me something valid!");
+        }
+    }
+
+    private void handleTodoCommand(String userInput) throws EinsteinException {
+        String description = userInput.substring(5).trim();
+        if (description.isEmpty()) {
+            throw new EinsteinException("Nein! You have to give a description to your todo.");
+        }
+        addTask(new Todo(description));
+    }
+
+    private void handleDeadlineCommand(String userInput) throws EinsteinException {
+        String[] parts = userInput.substring(9).split("/by", 2);
+        if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
+            throw new EinsteinException("Invalid deadline format! Use: deadline <description> /by <date>");
+        }
+        String description = parts[0].trim();
+        String by = parts[1].trim();
+        addTask(new Deadline(description, by));
+    }
+
+    private void handleEventCommand(String userInput) throws EinsteinException {
+        String[] parts = userInput.substring(6).split("/from|/to", 3);
+        if (parts.length < 3 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty() || parts[2].trim().isEmpty()) {
+            throw new EinsteinException("Invalid event format! Use: event <description> /from <start> /to <end>");
+        }
+        String description = parts[0].trim();
+        String from = parts[1].trim();
+        String to = parts[2].trim();
+        addTask(new Event(description, from, to));
     }
 
     // helper method to apply gradient colour to text (only for ASCII art) - created by DeepSeek
