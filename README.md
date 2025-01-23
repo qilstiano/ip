@@ -279,7 +279,7 @@ This project is licensed under the **MIT License**. See the LICENSE file for det
 
 ## 🙏 Acknowledgments
 
-- **DeepSeek:** For providing the gradient text styling and ASCII art inspiration.
+- **DeepSeek:** For providing the gradient text styling and ASCII art as well as for writing this README!
 - **Java:** For making this project possible with its robust and versatile programming language.
 
 ---
