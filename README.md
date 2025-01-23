@@ -1,26 +1,288 @@
-# Duke project template
+# 🧠 Einstein - A Smart Task Management Chatbot 🤖
 
-This is a project template for a greenfield Java project. It's named after the Java mascot _Duke_. Given below are instructions on how to use it.
+Welcome to **Einstein**, your intelligent task management assistant! Einstein is a chatbot designed to help you manage your tasks efficiently. Whether you need to add tasks, mark them as done, or delete them, Einstein is here to make your life easier. With a friendly interface and powerful features, Einstein ensures that you stay organized and productive.
 
-## Setting up in Intellij
+---
 
-Prerequisites: JDK 17, update Intellij to the most recent version.
+## 🚀 Features
 
-1. Open Intellij (if you are not in the welcome screen, click `File` > `Close Project` to close the existing project first)
-1. Open the project into Intellij as follows:
-   1. Click `Open`.
-   1. Select the project directory, and click `OK`.
-   1. If there are any further prompts, accept the defaults.
-1. Configure the project to use **JDK 17** (not other versions) as explained in [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
-   In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. After that, locate the `src/main/java/Duke.java` file, right-click it, and choose `Run Duke.main()` (if the code editor is showing compile errors, try restarting the IDE). If the setup is correct, you should see something like the below as the output:
-   ```
-   Hello from
-    ____        _        
-   |  _ \ _   _| | _____ 
-   | | | | | | | |/ / _ \
-   | |_| | |_| |   <  __/
-   |____/ \__,_|_|\_\___|
-   ```
+Einstein supports the following commands and features:
 
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+### 1. Add Tasks
+
+#### 📝 Todo: Add a simple task without a deadline.
+
+**Syntax:**
+```bash
+todo <description>
+```
+**Example:**
+```bash
+todo read book
+```
+
+#### ⏰ Deadline: Add a task with a deadline.
+
+**Syntax:**
+```bash
+deadline <description> /by <date>
+```
+**Example:**
+```bash
+deadline return book /by Sunday
+```
+
+#### 🗓️ Event: Add a task with a start and end time.
+
+**Syntax:**
+```bash
+event <description> /from <start> /to <end>
+```
+**Example:**
+```bash
+event project meeting /from Mon 2pm /to 4pm
+```
+
+### 2. 📋 List Tasks
+
+View all your tasks in a neatly formatted list.
+
+**Syntax:**
+```bash
+list
+```
+**Example:**
+```bash
+list
+```
+
+### 3. ✅ Mark Tasks as Done
+
+Mark a task as completed.
+
+**Syntax:**
+```bash
+mark <task number>
+```
+**Example:**
+```bash
+mark 1
+```
+
+### 4. ❌ Mark Tasks as Not Done
+
+Mark a task as not completed.
+
+**Syntax:**
+```bash
+unmark <task number>
+```
+**Example:**
+```bash
+unmark 1
+```
+
+### 5. 🗑️ Delete Tasks
+
+Remove a task from your list.
+
+**Syntax:**
+```bash
+delete <task number>
+```
+**Example:**
+```bash
+delete 1
+```
+
+### 6. 🔁 Help
+
+Display a list of all available commands and their usage.
+
+**Syntax:**
+```bash
+help
+```
+**Example:**
+```bash
+help
+```
+
+### 7. 🚪 Exit
+
+Exit the chatbot.
+
+**Syntax:**
+```bash
+bye
+```
+**Example:**
+```bash
+bye
+```
+
+---
+
+## 🛠️ Getting Started
+
+### Prerequisites
+
+- **Java Development Kit (JDK):** Ensure you have JDK installed on your system. You can download it [here](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html).
+- **Command Line Interface (CLI):** Einstein runs in the terminal or command prompt.
+
+### Running Einstein
+
+#### Download the Code:
+Clone or download the repository containing the Einstein chatbot code.
+
+#### Navigate to the Directory:
+Open your terminal or command prompt and navigate to the directory where the code is located.
+
+#### Compile the Code:
+
+```bash
+javac Einstein.java
+```
+
+#### Run the Chatbot:
+
+```bash
+java Einstein
+```
+
+#### Interact with Einstein:
+Once the chatbot starts, you can begin typing commands to manage your tasks.
+
+---
+
+## 🎯 Example Usage
+
+### Adding Tasks
+
+```bash
+> todo read book
+```
+```
+Einstein
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 task in the list.
+```
+
+### Listing Tasks
+
+```bash
+> list
+```
+```
+Einstein
+Here are the tasks in your list:
+1.[T][ ] read book
+```
+
+### Marking a Task as Done
+
+```bash
+> mark 1
+```
+```
+Einstein
+Nice! I've marked this task as done:
+  [T][X] read book
+```
+
+### Deleting a Task
+
+```bash
+> delete 1
+```
+```
+Einstein
+Noted. I've atomized this task:
+  [T][X] read book
+Now you have 0 tasks in the list.
+```
+
+### Getting Help
+
+```bash
+> help
+```
+```
+Einstein
+Here are the commands I understand:
+...
+```
+
+---
+
+## 🚨 Error Handling
+
+Einstein is designed to handle errors gracefully. If you enter an invalid command or task number, Einstein will provide a clear error message to guide you.
+
+### Examples of Error Handling
+
+#### Invalid Command
+
+```bash
+> blah
+```
+```
+Einstein
+ARGH! I do not understand you, which is weird,
+because I usually understand most things. Invalid command!
+```
+
+#### Blank Task Number
+
+```bash
+> delete
+```
+```
+Einstein
+Nein! You must provide a task number to delete.
+Use: delete <task number>
+```
+
+#### Invalid Task Number
+
+```bash
+> delete 999
+```
+```
+Einstein
+Invalid task number! Please give me something valid!
+```
+
+---
+
+## 🎨 Styling and ASCII Art
+
+Einstein's interface is designed to be visually appealing. Here's the ASCII art that greets you when you start the chatbot:
+
+```
+         _                   _           _            
+        (_)                 / |_        (_)           
+ .---.  __   _ .--.   .--. `| |-'.---.  __   _ .--.   
+/ /__\\[  | [ `.-. | ( (`\\] | | / /__\\[  | [ `.-. |  
+| \\__., | |  | | | |  `'.'. | |,| \\__., | |  | | | |  
+ '.__.'[___][___||__][\\__) )\__/ '.__.'[___][___||__]  v1.0
+```
+
+---
+
+## 🌟 License
+
+This project is licensed under the **MIT License**. See the LICENSE file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- **DeepSeek:** For providing the gradient text styling and ASCII art inspiration.
+- **Java:** For making this project possible with its robust and versatile programming language.
+
+---
+
+Enjoy using Einstein to manage your tasks efficiently! If you have any questions or feedback, feel free to reach out. 🚀
+
