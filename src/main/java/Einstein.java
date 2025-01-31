@@ -209,10 +209,15 @@ public class Einstein {
                 if (userInput.equalsIgnoreCase("bye")) {
                     farewell();
                     break;
-
-                } else if (userInput.equalsIgnoreCase("list")) {
-                    listTasks();
-
+                } else if (userInput.startsWith("list ")) {
+                    try {
+                        LocalDate date = LocalDate.parse(userInput.substring(5).trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                        listTasksByDate(date);
+                    } catch (DateTimeParseException e) {
+                        System.out.println("____________________________________________________________");
+                        System.out.println(getGradientText("Einstein\nInvalid date format! Use: list yyyy-MM-dd"));
+                        System.out.println("____________________________________________________________");
+                    }
                 } else if (userInput.startsWith("mark ")) {
                     handleMarkCommand(userInput);
 
