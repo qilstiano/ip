@@ -1,6 +1,12 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
+// Imports for file reading and writing
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.io.IOException;
+import java.util.List;
+
 class Task {
     protected String description;
     protected boolean isDone;
@@ -80,6 +86,9 @@ public class Einstein {
     public String chatbotName = "Einstein";
     private ArrayList<Task> tasks = new ArrayList<>(); // Use ArrayList to store tasks
 
+    private static final String DATA_FILE_PATH = Paths.get("data", "duke.txt")
+    .toString(); // OS-independent path
+
     // ANSI color codes for orange gradient
     private static final String[] ORANGE_GRADIENT = {
         "\u001B[38;5;202m", // Light orange
@@ -87,6 +96,7 @@ public class Einstein {
         "\u001B[38;5;214m", // Bright orange
         "\u001B[38;5;220m"  // Yellow-orange
     };
+
     private static final String RESET = "\u001B[0m"; // Reset color
 
     public Einstein() {
@@ -97,6 +107,8 @@ public class Einstein {
                         "| \\__., | |  | | | |  `'.'. | |,| \\__., | |  | | | |  \r\n" + //
                         " '.__.'[___][___||__][\\__) )\\__/ '.__.'[___][___||__]  v1.0\r\n" + //
                         "                                                     ";
+        
+        loadTasksFromFile(); // Load tasks when the chatbot starts
     }
 
     public void greeting() {
@@ -114,6 +126,8 @@ public class Einstein {
 
     public void addTask(Task task) {
         tasks.add(task);
+        saveTasksToFile(); // Save tasks after adding
+
         System.out.println("____________________________________________________________");
         System.out.println(getGradientText("Einstein\nGot it. I've added this task:"));
         System.out.println("  " + task);
@@ -139,6 +153,8 @@ public class Einstein {
     public void markTaskAsDone(int taskIndex) throws EinsteinException {
         if (taskIndex >= 0 && taskIndex < tasks.size()) {
             tasks.get(taskIndex).markAsDone();
+            saveTasksToFile(); // Save tasks after marking as done
+
             System.out.println("____________________________________________________________");
             System.out.println(getGradientText("Einstein\nNice! I've marked this task as done:"));
             System.out.println("  " + tasks.get(taskIndex));
@@ -163,6 +179,8 @@ public class Einstein {
     public void deleteTask(int taskIndex) throws EinsteinException {
         if (taskIndex >= 0 && taskIndex < tasks.size()) {
             Task removedTask = tasks.remove(taskIndex);
+            saveTasksToFile();
+
             System.out.println("____________________________________________________________");
             System.out.println(getGradientText("Einstein\nNoted. I've atomized this task:"));
             System.out.println("  " + removedTask);
@@ -309,6 +327,97 @@ public class Einstein {
             deleteTask(taskIndex);
         } catch (NumberFormatException e) {
             throw new EinsteinException("Invalid task number! Please give me something valid!");
+        }
+    }
+
+    private void saveTasksToFile() {
+        try {
+
+            // Ensure the data directory exists
+            Files.createDirectories(Paths.get("data"));
+
+            // Converts tasks to a string format 
+            StringBuilder data = new StringBuilder();
+
+            for (Task task : tasks) {
+                if (task instanceof Todo) {
+                    data.append("T | ").append(task.isDone ? "1" : "0").append(" | ")
+                    .append(task.description).append("\n");
+                } else if (task instanceof Deadline) {
+                    Deadline deadline = (Deadline) task;
+                    data.append("D | ").append(deadline.isDone ? "1" : "0").append(" | ").append(deadline.description)
+                    .append(" | ").append(deadline.by).append("\n");
+                } else if (task instanceof Event) {
+                    Event event = (Event) task;
+                    data.append("E | ").append(event.isDone ? "1" : "0").append(" | ").append(event.description).append(" | ")
+                    .append(event.from).append(" | ").append(event.to).append("\n");
+                }
+            }
+            
+            // Write to file
+            Files.write(Paths.get(DATA_FILE_PATH), data.toString().getBytes());
+        } catch (IOException e) {
+
+            System.out.println("____________________________________________________________");
+            System.out.println(getGradientText("Einstein\nError saving tasks to file: " + e.getMessage()));
+            System.out.println("____________________________________________________________");        
+        }
+    }
+
+    private void loadTasksFromFile() {
+        try {
+            // Check if the file exists
+            if (!Files.exists(Paths.get(DATA_FILE_PATH))) {
+                System.out.println(getGradientText("Einstein\nNo existing tasks found. Starting with an empty list."));
+                return;
+            }
+    
+            // Read all lines from the file
+            List<String> lines = Files.readAllLines(Paths.get(DATA_FILE_PATH));
+            for (String line : lines) {
+                String[] parts = line.split(" \\| ");
+                if (parts.length < 3) {
+                    System.out.println(getGradientText("Einstein\nCorrupted data found in file. Skipping line: " + line));
+                    continue;
+                }
+    
+                String type = parts[0].trim();
+                boolean isDone = parts[1].trim().equals("1");
+                String description = parts[2].trim();
+    
+                Task task;
+                switch (type) {
+                    case "T":
+                        task = new Todo(description);
+                        break;
+                    case "D":
+                        if (parts.length < 4) {
+                            System.out.println(getGradientText("Einstein\nCorrupted deadline data found. Skipping line: " + line));
+                            continue;
+                        }
+                        task = new Deadline(description, parts[3].trim());
+                        break;
+                    case "E":
+                        if (parts.length < 5) {
+                            System.out.println(getGradientText("Einstein\nCorrupted event data found. Skipping line: " + line));
+                            continue;
+                        }
+                        task = new Event(description, parts[3].trim(), parts[4].trim());
+                        break;
+                    default:
+                        System.out.println(getGradientText("Einstein\nUnknown task type found. Skipping line: " + line));
+                        continue;
+                }
+    
+                if (isDone) {
+                    task.markAsDone();
+                }
+                tasks.add(task);
+            }
+        } catch (IOException e) {
+            System.out.println("____________________________________________________________");
+            System.out.println(getGradientText("Einstein\nError loading tasks from file: " + e.getMessage()));
+            System.out.println("____________________________________________________________");
         }
     }
 
