@@ -7,6 +7,12 @@ import java.nio.file.Files;
 import java.io.IOException;
 import java.util.List;
 
+// Imports for Date and Time
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 class Task {
     protected String description;
     protected boolean isDone;
@@ -46,24 +52,25 @@ class Todo extends Task {
 }
 
 class Deadline extends Task {
-    protected String by;
+    protected LocalDateTime by;
 
-    public Deadline(String description, String by) {
+    public Deadline(String description, LocalDateTime by) {
         super(description);
         this.by = by;
     }
 
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + by + ")";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy, h:mm a");
+        return "[D]" + super.toString() + " (by: " + by.format(formatter) + ")";
     }
 }
 
 class Event extends Task {
-    protected String from;
-    protected String to;
+    protected LocalDateTime from;
+    protected LocalDateTime to;
 
-    public Event(String description, String from, String to) {
+    public Event(String description, LocalDateTime from, LocalDateTime to) {
         super(description);
         this.from = from;
         this.to = to;
@@ -71,7 +78,8 @@ class Event extends Task {
 
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy, h:mm a");
+        return "[E]" + super.toString() + " (from: " + from.format(formatter) + " to: " + to.format(formatter) + ")";
     }
 }
 
@@ -135,19 +143,31 @@ public class Einstein {
         System.out.println("____________________________________________________________");
     }
 
-    public void listTasks() {
-        System.out.println("____________________________________________________________");
-        System.out.println(getGradientText("Einstein\nHere are the tasks in your list:"));
-
-        if (tasks.isEmpty()) {
-            System.out.println("Hmmm, didn't find any tasks. Add some tasks!");
-        } else {
-            for (int i = 0; i < tasks.size(); i++) {
-                System.out.println((i + 1) + "." + tasks.get(i));
+    public void listTasks(String userInput) {
+        if (userInput.equalsIgnoreCase("list")) {
+            // List all tasks
+            System.out.println("____________________________________________________________");
+            System.out.println(getGradientText("Einstein\nHere are the tasks in your list:"));
+    
+            if (tasks.isEmpty()) {
+                System.out.println("Hmmm, didn't find any tasks. Add some tasks!");
+            } else {
+                for (int i = 0; i < tasks.size(); i++) {
+                    System.out.println((i + 1) + "." + tasks.get(i));
+                }
+            }
+            System.out.println("____________________________________________________________");
+        } else if (userInput.startsWith("list ")) {
+            // List tasks on a specific date
+            try {
+                LocalDate date = LocalDate.parse(userInput.substring(5).trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                listTasksByDate(date);
+            } catch (DateTimeParseException e) {
+                System.out.println("____________________________________________________________");
+                System.out.println(getGradientText("Einstein\nInvalid date format! Use: list yyyy-MM-dd"));
+                System.out.println("____________________________________________________________");
             }
         }
-
-        System.out.println("____________________________________________________________");
     }
 
     public void markTaskAsDone(int taskIndex) throws EinsteinException {
@@ -191,69 +211,35 @@ public class Einstein {
         }
     }
 
-    public void displayHelp() {
-        System.out.println("____________________________________________________________");
-        System.out.println(getGradientText("Einstein\nHere are the commands I understand:"));
-        System.out.println("1. todo <description> - Add a todo task.");
-        System.out.println("   Example: todo read book");
-        System.out.println("2. deadline <description> /by <date> - Add a deadline task.");
-        System.out.println("   Example: deadline return book /by Sunday");
-        System.out.println("3. event <description> /from <start> /to <end> - Add an event task.");
-        System.out.println("   Example: event project meeting /from Mon 2pm /to 4pm");
-        System.out.println("4. list - List all tasks.");
-        System.out.println("   Example: list");
-        System.out.println("5. mark <task number> - Mark a task as done.");
-        System.out.println("   Example: mark 1");
-        System.out.println("6. unmark <task number> - Mark a task as not done.");
-        System.out.println("   Example: unmark 1");
-        System.out.println("7. delete <task number> - Delete a task.");
-        System.out.println("   Example: delete 1");
-        System.out.println("8. help - Display this help message.");
-        System.out.println("   Example: help");
-        System.out.println("9. bye - Exit the program.");
-        System.out.println("   Example: bye");
-        System.out.println("____________________________________________________________");
-    }
-
     public void processCommands() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("User\n> ");
             String userInput = scanner.nextLine().trim();
-
+    
             try {
                 if (userInput.equalsIgnoreCase("bye")) {
                     farewell();
                     break;
-
-                } else if (userInput.equalsIgnoreCase("list")) {
-                    listTasks();
-
+                } else if (userInput.startsWith("list")) {
+                    listTasks(userInput); // Handle both "list" and "list <date>"
                 } else if (userInput.startsWith("mark ")) {
                     handleMarkCommand(userInput);
-
                 } else if (userInput.startsWith("unmark ")) {
                     handleUnmarkCommand(userInput);
-
                 } else if (userInput.startsWith("todo ")) {
                     handleTodoCommand(userInput);
-
                 } else if (userInput.startsWith("deadline ")) {
                     handleDeadlineCommand(userInput);
-
                 } else if (userInput.startsWith("event ")) {
                     handleEventCommand(userInput);
-
                 } else if (userInput.startsWith("delete ")) {
                     handleDeleteCommand(userInput);
-
                 } else if (userInput.equalsIgnoreCase("help")) {
                     displayHelp();
-
                 } else {
                     throw new EinsteinException("ARGH! I do not understand you, which is weird, \nbecause I usually understand most things. Invalid command!");
                 }
-
             } catch (EinsteinException e) {
                 System.out.println("____________________________________________________________");
                 System.out.println(getGradientText("Einstein\n" + e.getMessage()));
@@ -299,7 +285,7 @@ public class Einstein {
             throw new EinsteinException("Invalid deadline format! Use: deadline <description> /by <date>");
         }
         String description = parts[0].trim();
-        String by = parts[1].trim();
+        LocalDateTime by = parseDateTime(parts[1].trim());
         addTask(new Deadline(description, by));
     }
 
@@ -309,8 +295,8 @@ public class Einstein {
             throw new EinsteinException("Invalid event format! Use: event <description> /from <start> /to <end>");
         }
         String description = parts[0].trim();
-        String from = parts[1].trim();
-        String to = parts[2].trim();
+        LocalDateTime from = parseDateTime(parts[1].trim());
+        LocalDateTime to = parseDateTime(parts[2].trim());
         addTask(new Event(description, from, to));
     }
 
@@ -332,59 +318,52 @@ public class Einstein {
 
     private void saveTasksToFile() {
         try {
-
-            // Ensure the data directory exists
             Files.createDirectories(Paths.get("data"));
-
-            // Converts tasks to a string format 
             StringBuilder data = new StringBuilder();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
 
             for (Task task : tasks) {
                 if (task instanceof Todo) {
-                    data.append("T | ").append(task.isDone ? "1" : "0").append(" | ")
-                    .append(task.description).append("\n");
+                    data.append("T | ").append(task.isDone ? "1" : "0").append(" | ").append(task.description).append("\n");
                 } else if (task instanceof Deadline) {
                     Deadline deadline = (Deadline) task;
                     data.append("D | ").append(deadline.isDone ? "1" : "0").append(" | ").append(deadline.description)
-                    .append(" | ").append(deadline.by).append("\n");
+                        .append(" | ").append(deadline.by.format(formatter)).append("\n");
                 } else if (task instanceof Event) {
                     Event event = (Event) task;
-                    data.append("E | ").append(event.isDone ? "1" : "0").append(" | ").append(event.description).append(" | ")
-                    .append(event.from).append(" | ").append(event.to).append("\n");
+                    data.append("E | ").append(event.isDone ? "1" : "0").append(" | ").append(event.description)
+                        .append(" | ").append(event.from.format(formatter)).append(" | ").append(event.to.format(formatter)).append("\n");
                 }
             }
-            
-            // Write to file
             Files.write(Paths.get(DATA_FILE_PATH), data.toString().getBytes());
         } catch (IOException e) {
-
             System.out.println("____________________________________________________________");
             System.out.println(getGradientText("Einstein\nError saving tasks to file: " + e.getMessage()));
-            System.out.println("____________________________________________________________");        
+            System.out.println("____________________________________________________________");
         }
     }
 
     private void loadTasksFromFile() {
         try {
-            // Check if the file exists
             if (!Files.exists(Paths.get(DATA_FILE_PATH))) {
                 System.out.println(getGradientText("Einstein\nNo existing tasks found. Starting with an empty list."));
                 return;
             }
-    
-            // Read all lines from the file
+
             List<String> lines = Files.readAllLines(Paths.get(DATA_FILE_PATH));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
+
             for (String line : lines) {
                 String[] parts = line.split(" \\| ");
                 if (parts.length < 3) {
                     System.out.println(getGradientText("Einstein\nCorrupted data found in file. Skipping line: " + line));
                     continue;
                 }
-    
+
                 String type = parts[0].trim();
                 boolean isDone = parts[1].trim().equals("1");
                 String description = parts[2].trim();
-    
+
                 Task task;
                 switch (type) {
                     case "T":
@@ -395,30 +374,97 @@ public class Einstein {
                             System.out.println(getGradientText("Einstein\nCorrupted deadline data found. Skipping line: " + line));
                             continue;
                         }
-                        task = new Deadline(description, parts[3].trim());
+                        LocalDateTime by = LocalDateTime.parse(parts[3].trim(), formatter);
+                        task = new Deadline(description, by);
                         break;
                     case "E":
                         if (parts.length < 5) {
                             System.out.println(getGradientText("Einstein\nCorrupted event data found. Skipping line: " + line));
                             continue;
                         }
-                        task = new Event(description, parts[3].trim(), parts[4].trim());
+                        LocalDateTime from = LocalDateTime.parse(parts[3].trim(), formatter);
+                        LocalDateTime to = LocalDateTime.parse(parts[4].trim(), formatter);
+                        task = new Event(description, from, to);
                         break;
                     default:
                         System.out.println(getGradientText("Einstein\nUnknown task type found. Skipping line: " + line));
                         continue;
                 }
-    
+
                 if (isDone) {
                     task.markAsDone();
                 }
                 tasks.add(task);
             }
-        } catch (IOException e) {
+        } catch (IOException | DateTimeParseException e) {
             System.out.println("____________________________________________________________");
             System.out.println(getGradientText("Einstein\nError loading tasks from file: " + e.getMessage()));
             System.out.println("____________________________________________________________");
         }
+    }
+
+    private LocalDateTime parseDateTime(String dateTimeStr) throws EinsteinException {
+        try {
+            // Try parsing with date and time format (e.g., "2/12/2019 1800")
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
+            return LocalDateTime.parse(dateTimeStr, formatter);
+        } catch (DateTimeParseException e) {
+            throw new EinsteinException("Invalid date/time format! Use: dd/MM/yyyy HHmm (e.g., 2/12/2019 1800)");
+        }
+    }
+
+    public void listTasksByDate(LocalDate date) {
+        System.out.println("____________________________________________________________");
+        System.out.println(getGradientText("Einstein\nHere are the tasks occurring on " + date.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":"));
+    
+        boolean found = false;
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+            if (task instanceof Deadline) {
+                Deadline deadline = (Deadline) task;
+                if (deadline.by.toLocalDate().equals(date)) {
+                    System.out.println((i + 1) + "." + deadline);
+                    found = true;
+                }
+            } else if (task instanceof Event) {
+                Event event = (Event) task;
+                if (event.from.toLocalDate().equals(date) || event.to.toLocalDate().equals(date)) {
+                    System.out.println((i + 1) + "." + event);
+                    found = true;
+                }
+            }
+        }
+    
+        if (!found) {
+            System.out.println("No tasks found for this date.");
+        }
+        System.out.println("____________________________________________________________");
+    }
+
+    public void displayHelp() {
+        System.out.println("____________________________________________________________");
+        System.out.println(getGradientText("Einstein\nHere are the commands I understand:"));
+        System.out.println("1. todo <description> - Add a todo task.");
+        System.out.println("   Example: todo read book");
+        System.out.println("2. deadline <description> /by <date> - Add a deadline task.");
+        System.out.println("   Example: deadline return book /by 2/12/2019 1800");
+        System.out.println("3. event <description> /from <start> /to <end> - Add an event task.");
+        System.out.println("   Example: event project meeting /from 2/12/2019 1400 /to 2/12/2019 1600");
+        System.out.println("4. list - List all tasks.");
+        System.out.println("   Example: list");
+        System.out.println("5. list <date> - List tasks occurring on a specific date (format: yyyy-MM-dd).");
+        System.out.println("   Example: list 2019-12-02");
+        System.out.println("6. mark <task number> - Mark a task as done.");
+        System.out.println("   Example: mark 1");
+        System.out.println("7. unmark <task number> - Mark a task as not done.");
+        System.out.println("   Example: unmark 1");
+        System.out.println("8. delete <task number> - Delete a task.");
+        System.out.println("   Example: delete 1");
+        System.out.println("9. help - Display this help message.");
+        System.out.println("   Example: help");
+        System.out.println("10. bye - Exit the program.");
+        System.out.println("   Example: bye");
+        System.out.println("____________________________________________________________");
     }
 
     // helper method to apply gradient colour to text (only for ASCII art) - created by DeepSeek
