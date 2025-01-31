@@ -143,19 +143,31 @@ public class Einstein {
         System.out.println("____________________________________________________________");
     }
 
-    public void listTasks() {
-        System.out.println("____________________________________________________________");
-        System.out.println(getGradientText("Einstein\nHere are the tasks in your list:"));
-
-        if (tasks.isEmpty()) {
-            System.out.println("Hmmm, didn't find any tasks. Add some tasks!");
-        } else {
-            for (int i = 0; i < tasks.size(); i++) {
-                System.out.println((i + 1) + "." + tasks.get(i));
+    public void listTasks(String userInput) {
+        if (userInput.equalsIgnoreCase("list")) {
+            // List all tasks
+            System.out.println("____________________________________________________________");
+            System.out.println(getGradientText("Einstein\nHere are the tasks in your list:"));
+    
+            if (tasks.isEmpty()) {
+                System.out.println("Hmmm, didn't find any tasks. Add some tasks!");
+            } else {
+                for (int i = 0; i < tasks.size(); i++) {
+                    System.out.println((i + 1) + "." + tasks.get(i));
+                }
+            }
+            System.out.println("____________________________________________________________");
+        } else if (userInput.startsWith("list ")) {
+            // List tasks on a specific date
+            try {
+                LocalDate date = LocalDate.parse(userInput.substring(5).trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                listTasksByDate(date);
+            } catch (DateTimeParseException e) {
+                System.out.println("____________________________________________________________");
+                System.out.println(getGradientText("Einstein\nInvalid date format! Use: list yyyy-MM-dd"));
+                System.out.println("____________________________________________________________");
             }
         }
-
-        System.out.println("____________________________________________________________");
     }
 
     public void markTaskAsDone(int taskIndex) throws EinsteinException {
@@ -204,45 +216,30 @@ public class Einstein {
         while (true) {
             System.out.print("User\n> ");
             String userInput = scanner.nextLine().trim();
-
+    
             try {
                 if (userInput.equalsIgnoreCase("bye")) {
                     farewell();
                     break;
-                } else if (userInput.startsWith("list ")) {
-                    try {
-                        LocalDate date = LocalDate.parse(userInput.substring(5).trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                        listTasksByDate(date);
-                    } catch (DateTimeParseException e) {
-                        System.out.println("____________________________________________________________");
-                        System.out.println(getGradientText("Einstein\nInvalid date format! Use: list yyyy-MM-dd"));
-                        System.out.println("____________________________________________________________");
-                    }
+                } else if (userInput.startsWith("list")) {
+                    listTasks(userInput); // Handle both "list" and "list <date>"
                 } else if (userInput.startsWith("mark ")) {
                     handleMarkCommand(userInput);
-
                 } else if (userInput.startsWith("unmark ")) {
                     handleUnmarkCommand(userInput);
-
                 } else if (userInput.startsWith("todo ")) {
                     handleTodoCommand(userInput);
-
                 } else if (userInput.startsWith("deadline ")) {
                     handleDeadlineCommand(userInput);
-
                 } else if (userInput.startsWith("event ")) {
                     handleEventCommand(userInput);
-
                 } else if (userInput.startsWith("delete ")) {
                     handleDeleteCommand(userInput);
-
                 } else if (userInput.equalsIgnoreCase("help")) {
                     displayHelp();
-
                 } else {
                     throw new EinsteinException("ARGH! I do not understand you, which is weird, \nbecause I usually understand most things. Invalid command!");
                 }
-
             } catch (EinsteinException e) {
                 System.out.println("____________________________________________________________");
                 System.out.println(getGradientText("Einstein\n" + e.getMessage()));
