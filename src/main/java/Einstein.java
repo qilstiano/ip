@@ -7,6 +7,12 @@ import java.nio.file.Files;
 import java.io.IOException;
 import java.util.List;
 
+// Imports for Date and Time
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 class Task {
     protected String description;
     protected boolean isDone;
@@ -46,24 +52,25 @@ class Todo extends Task {
 }
 
 class Deadline extends Task {
-    protected String by;
+    protected LocalDateTime by;
 
-    public Deadline(String description, String by) {
+    public Deadline(String description, LocalDateTime by) {
         super(description);
         this.by = by;
     }
 
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + by + ")";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy, h:mm a");
+        return "[D]" + super.toString() + " (by: " + by.format(formatter) + ")";
     }
 }
 
 class Event extends Task {
-    protected String from;
-    protected String to;
+    protected LocalDateTime from;
+    protected LocalDateTime to;
 
-    public Event(String description, String from, String to) {
+    public Event(String description, LocalDateTime from, LocalDateTime to) {
         super(description);
         this.from = from;
         this.to = to;
@@ -71,7 +78,8 @@ class Event extends Task {
 
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy, h:mm a");
+        return "[E]" + super.toString() + " (from: " + from.format(formatter) + " to: " + to.format(formatter) + ")";
     }
 }
 
