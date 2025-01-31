@@ -199,30 +199,6 @@ public class Einstein {
         }
     }
 
-    public void displayHelp() {
-        System.out.println("____________________________________________________________");
-        System.out.println(getGradientText("Einstein\nHere are the commands I understand:"));
-        System.out.println("1. todo <description> - Add a todo task.");
-        System.out.println("   Example: todo read book");
-        System.out.println("2. deadline <description> /by <date> - Add a deadline task.");
-        System.out.println("   Example: deadline return book /by Sunday");
-        System.out.println("3. event <description> /from <start> /to <end> - Add an event task.");
-        System.out.println("   Example: event project meeting /from Mon 2pm /to 4pm");
-        System.out.println("4. list - List all tasks.");
-        System.out.println("   Example: list");
-        System.out.println("5. mark <task number> - Mark a task as done.");
-        System.out.println("   Example: mark 1");
-        System.out.println("6. unmark <task number> - Mark a task as not done.");
-        System.out.println("   Example: unmark 1");
-        System.out.println("7. delete <task number> - Delete a task.");
-        System.out.println("   Example: delete 1");
-        System.out.println("8. help - Display this help message.");
-        System.out.println("   Example: help");
-        System.out.println("9. bye - Exit the program.");
-        System.out.println("   Example: bye");
-        System.out.println("____________________________________________________________");
-    }
-
     public void processCommands() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -340,59 +316,52 @@ public class Einstein {
 
     private void saveTasksToFile() {
         try {
-
-            // Ensure the data directory exists
             Files.createDirectories(Paths.get("data"));
-
-            // Converts tasks to a string format 
             StringBuilder data = new StringBuilder();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
 
             for (Task task : tasks) {
                 if (task instanceof Todo) {
-                    data.append("T | ").append(task.isDone ? "1" : "0").append(" | ")
-                    .append(task.description).append("\n");
+                    data.append("T | ").append(task.isDone ? "1" : "0").append(" | ").append(task.description).append("\n");
                 } else if (task instanceof Deadline) {
                     Deadline deadline = (Deadline) task;
                     data.append("D | ").append(deadline.isDone ? "1" : "0").append(" | ").append(deadline.description)
-                    .append(" | ").append(deadline.by).append("\n");
+                        .append(" | ").append(deadline.by.format(formatter)).append("\n");
                 } else if (task instanceof Event) {
                     Event event = (Event) task;
-                    data.append("E | ").append(event.isDone ? "1" : "0").append(" | ").append(event.description).append(" | ")
-                    .append(event.from).append(" | ").append(event.to).append("\n");
+                    data.append("E | ").append(event.isDone ? "1" : "0").append(" | ").append(event.description)
+                        .append(" | ").append(event.from.format(formatter)).append(" | ").append(event.to.format(formatter)).append("\n");
                 }
             }
-            
-            // Write to file
             Files.write(Paths.get(DATA_FILE_PATH), data.toString().getBytes());
         } catch (IOException e) {
-
             System.out.println("____________________________________________________________");
             System.out.println(getGradientText("Einstein\nError saving tasks to file: " + e.getMessage()));
-            System.out.println("____________________________________________________________");        
+            System.out.println("____________________________________________________________");
         }
     }
 
     private void loadTasksFromFile() {
         try {
-            // Check if the file exists
             if (!Files.exists(Paths.get(DATA_FILE_PATH))) {
                 System.out.println(getGradientText("Einstein\nNo existing tasks found. Starting with an empty list."));
                 return;
             }
-    
-            // Read all lines from the file
+
             List<String> lines = Files.readAllLines(Paths.get(DATA_FILE_PATH));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
+
             for (String line : lines) {
                 String[] parts = line.split(" \\| ");
                 if (parts.length < 3) {
                     System.out.println(getGradientText("Einstein\nCorrupted data found in file. Skipping line: " + line));
                     continue;
                 }
-    
+
                 String type = parts[0].trim();
                 boolean isDone = parts[1].trim().equals("1");
                 String description = parts[2].trim();
-    
+
                 Task task;
                 switch (type) {
                     case "T":
@@ -403,26 +372,29 @@ public class Einstein {
                             System.out.println(getGradientText("Einstein\nCorrupted deadline data found. Skipping line: " + line));
                             continue;
                         }
-                        task = new Deadline(description, parts[3].trim());
+                        LocalDateTime by = LocalDateTime.parse(parts[3].trim(), formatter);
+                        task = new Deadline(description, by);
                         break;
                     case "E":
                         if (parts.length < 5) {
                             System.out.println(getGradientText("Einstein\nCorrupted event data found. Skipping line: " + line));
                             continue;
                         }
-                        task = new Event(description, parts[3].trim(), parts[4].trim());
+                        LocalDateTime from = LocalDateTime.parse(parts[3].trim(), formatter);
+                        LocalDateTime to = LocalDateTime.parse(parts[4].trim(), formatter);
+                        task = new Event(description, from, to);
                         break;
                     default:
                         System.out.println(getGradientText("Einstein\nUnknown task type found. Skipping line: " + line));
                         continue;
                 }
-    
+
                 if (isDone) {
                     task.markAsDone();
                 }
                 tasks.add(task);
             }
-        } catch (IOException e) {
+        } catch (IOException | DateTimeParseException e) {
             System.out.println("____________________________________________________________");
             System.out.println(getGradientText("Einstein\nError loading tasks from file: " + e.getMessage()));
             System.out.println("____________________________________________________________");
@@ -464,6 +436,32 @@ public class Einstein {
         if (!found) {
             System.out.println("No tasks found for this date.");
         }
+        System.out.println("____________________________________________________________");
+    }
+
+    public void displayHelp() {
+        System.out.println("____________________________________________________________");
+        System.out.println(getGradientText("Einstein\nHere are the commands I understand:"));
+        System.out.println("1. todo <description> - Add a todo task.");
+        System.out.println("   Example: todo read book");
+        System.out.println("2. deadline <description> /by <date> - Add a deadline task.");
+        System.out.println("   Example: deadline return book /by 2/12/2019 1800");
+        System.out.println("3. event <description> /from <start> /to <end> - Add an event task.");
+        System.out.println("   Example: event project meeting /from 2/12/2019 1400 /to 2/12/2019 1600");
+        System.out.println("4. list - List all tasks.");
+        System.out.println("   Example: list");
+        System.out.println("5. list <date> - List tasks occurring on a specific date (format: yyyy-MM-dd).");
+        System.out.println("   Example: list 2019-12-02");
+        System.out.println("6. mark <task number> - Mark a task as done.");
+        System.out.println("   Example: mark 1");
+        System.out.println("7. unmark <task number> - Mark a task as not done.");
+        System.out.println("   Example: unmark 1");
+        System.out.println("8. delete <task number> - Delete a task.");
+        System.out.println("   Example: delete 1");
+        System.out.println("9. help - Display this help message.");
+        System.out.println("   Example: help");
+        System.out.println("10. bye - Exit the program.");
+        System.out.println("   Example: bye");
         System.out.println("____________________________________________________________");
     }
 
