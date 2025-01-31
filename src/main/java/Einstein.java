@@ -307,7 +307,7 @@ public class Einstein {
             throw new EinsteinException("Invalid deadline format! Use: deadline <description> /by <date>");
         }
         String description = parts[0].trim();
-        String by = parts[1].trim();
+        LocalDateTime by = parseDateTime(parts[1].trim());
         addTask(new Deadline(description, by));
     }
 
@@ -317,8 +317,8 @@ public class Einstein {
             throw new EinsteinException("Invalid event format! Use: event <description> /from <start> /to <end>");
         }
         String description = parts[0].trim();
-        String from = parts[1].trim();
-        String to = parts[2].trim();
+        LocalDateTime from = parseDateTime(parts[1].trim());
+        LocalDateTime to = parseDateTime(parts[2].trim());
         addTask(new Event(description, from, to));
     }
 
@@ -427,6 +427,44 @@ public class Einstein {
             System.out.println(getGradientText("Einstein\nError loading tasks from file: " + e.getMessage()));
             System.out.println("____________________________________________________________");
         }
+    }
+
+    private LocalDateTime parseDateTime(String dateTimeStr) throws EinsteinException {
+        try {
+            // Try parsing with date and time format (e.g., "2/12/2019 1800")
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
+            return LocalDateTime.parse(dateTimeStr, formatter);
+        } catch (DateTimeParseException e) {
+            throw new EinsteinException("Invalid date/time format! Use: dd/MM/yyyy HHmm (e.g., 2/12/2019 1800)");
+        }
+    }
+
+    public void listTasksByDate(LocalDate date) {
+        System.out.println("____________________________________________________________");
+        System.out.println(getGradientText("Einstein\nHere are the tasks occurring on " + date.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":"));
+    
+        boolean found = false;
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+            if (task instanceof Deadline) {
+                Deadline deadline = (Deadline) task;
+                if (deadline.by.toLocalDate().equals(date)) {
+                    System.out.println((i + 1) + "." + deadline);
+                    found = true;
+                }
+            } else if (task instanceof Event) {
+                Event event = (Event) task;
+                if (event.from.toLocalDate().equals(date) || event.to.toLocalDate().equals(date)) {
+                    System.out.println((i + 1) + "." + event);
+                    found = true;
+                }
+            }
+        }
+    
+        if (!found) {
+            System.out.println("No tasks found for this date.");
+        }
+        System.out.println("____________________________________________________________");
     }
 
     // helper method to apply gradient colour to text (only for ASCII art) - created by DeepSeek
