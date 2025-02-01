@@ -41,6 +41,6 @@ public class Einstein {
     }
 
     public static void main(String[] args) {
-        new Einstein("data/duke.txt").run();
+        new Einstein("data/einstein.txt").run();
     }
 }
