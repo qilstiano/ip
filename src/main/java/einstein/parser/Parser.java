@@ -1,7 +1,17 @@
-package parser;
+package einstein.parser;
 
 import einstein.exception.EinsteinException;
 import einstein.command.Command;
+import einstein.command.ExitCommand;
+import einstein.command.ListCommand;
+import einstein.command.ListByDateCommand;
+import einstein.command.MarkCommand;
+import einstein.command.UnmarkCommand;
+import einstein.command.AddTodoCommand;
+import einstein.command.AddDeadlineCommand;
+import einstein.command.AddEventCommand;
+import einstein.command.DeleteCommand;
+import einstein.command.HelpCommand;
 
 public class Parser {
     public static Command parse(String fullCommand) throws EinsteinException {

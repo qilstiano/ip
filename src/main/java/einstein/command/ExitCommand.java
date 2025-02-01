@@ -1,7 +1,5 @@
 package einstein.command;
 
-
-
 import einstein.exception.EinsteinException;
 import einstein.storage.TaskList;
 import einstein.ui.Ui;
