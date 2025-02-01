@@ -13,6 +13,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+class EinsteinException extends Exception {
+    public EinsteinException(String message) {
+        super(message);
+    }
+}
+
 class Task {
     protected String description;
     protected boolean isDone;
@@ -83,240 +89,164 @@ class Event extends Task {
     }
 }
 
-class EinsteinException extends Exception {
-    public EinsteinException(String message) {
-        super(message);
-    }
-}
-
-public class Einstein {
-    public String chatbotAscii;
-    public String chatbotName = "Einstein";
-    private ArrayList<Task> tasks = new ArrayList<>(); // Use ArrayList to store tasks
-
-    private static final String DATA_FILE_PATH = Paths.get("data", "duke.txt")
-    .toString(); // OS-independent path
-
-    // ANSI color codes for orange gradient
+class Ui {
     private static final String[] ORANGE_GRADIENT = {
         "\u001B[38;5;202m", // Light orange
         "\u001B[38;5;208m", // Medium orange
         "\u001B[38;5;214m", // Bright orange
         "\u001B[38;5;220m"  // Yellow-orange
     };
-
     private static final String RESET = "\u001B[0m"; // Reset color
 
-    public Einstein() {
-        chatbotAscii =  "         _                   _           _            \r\n" + //
-                        "        (_)                 / |_        (_)           \r\n" + //
-                        " .---.  __   _ .--.   .--. `| |-'.---.  __   _ .--.   \r\n" + //
-                        "/ /__\\\\[  | [ `.-. | ( (`\\] | | / /__\\\\[  | [ `.-. |  \r\n" + //
-                        "| \\__., | |  | | | |  `'.'. | |,| \\__., | |  | | | |  \r\n" + //
-                        " '.__.'[___][___||__][\\__) )\\__/ '.__.'[___][___||__]  v1.0\r\n" + //
-                        "                                                     ";
-        
-        loadTasksFromFile(); // Load tasks when the chatbot starts
-    }
-
-    public void greeting() {
+    public void showWelcome() {
+        String chatbotAscii = "         _                   _           _            \r\n" + //
+                              "        (_)                 / |_        (_)           \r\n" + //
+                              " .---.  __   _ .--.   .--. `| |-'.---.  __   _ .--.   \r\n" + //
+                              "/ /__\\\\[  | [ `.-. | ( (`\\] | | / /__\\\\[  | [ `.-. |  \r\n" + //
+                              "| \\__., | |  | | | |  `'.'. | |,| \\__., | |  | | | |  \r\n" + //
+                              " '.__.'[___][___||__][\\__) )\\__/ '.__.'[___][___||__]  v1.0\r\n" + //
+                              "                                                     ";
         System.out.println("____________________________________________________________");
         System.out.println(getGradientText(chatbotAscii));
-        System.out.println(getGradientText("\nEinstein\nGuten tag, " + chatbotName + " here! What can I do for you?"));
+        System.out.println(getGradientText("\nEinstein\nGuten tag, Einstein here! What can I do for you?"));
         System.out.println("____________________________________________________________");
     }
 
-    public void farewell() {
+    public void showFarewell() {
         System.out.println("____________________________________________________________");
         System.out.println(getGradientText("Einstein\n\tBye, hope to see you again soon!"));
         System.out.println("____________________________________________________________");
     }
 
-    public void addTask(Task task) {
-        tasks.add(task);
-        saveTasksToFile(); // Save tasks after adding
-
+    public void showLine() {
         System.out.println("____________________________________________________________");
+    }
+
+    public void showError(String message) {
+        System.out.println(getGradientText("Einstein\n" + message));
+    }
+
+    public String readCommand() {
+        System.out.print("User\n> ");
+        return new Scanner(System.in).nextLine().trim();
+    }
+
+    public void showTaskAdded(Task task, int taskCount) {
         System.out.println(getGradientText("Einstein\nGot it. I've added this task:"));
         System.out.println("  " + task);
-        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        System.out.println("____________________________________________________________");
+        System.out.println("Now you have " + taskCount + " tasks in the list.");
     }
 
-    public void listTasks(String userInput) {
-        if (userInput.equalsIgnoreCase("list")) {
-            // List all tasks
-            System.out.println("____________________________________________________________");
-            System.out.println(getGradientText("Einstein\nHere are the tasks in your list:"));
-    
-            if (tasks.isEmpty()) {
-                System.out.println("Hmmm, didn't find any tasks. Add some tasks!");
-            } else {
-                for (int i = 0; i < tasks.size(); i++) {
-                    System.out.println((i + 1) + "." + tasks.get(i));
+    public void showTaskList(ArrayList<Task> tasks) {
+        System.out.println(getGradientText("Einstein\nHere are the tasks in your list:"));
+        if (tasks.isEmpty()) {
+            System.out.println("Hmmm, didn't find any tasks. Add some tasks!");
+        } else {
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println((i + 1) + "." + tasks.get(i));
+            }
+        }
+    }
+
+    public void showTasksByDate(ArrayList<Task> tasks, LocalDate date) {
+        System.out.println(getGradientText("Einstein\nHere are the tasks occurring on " + date.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":"));
+        boolean found = false;
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+            if (task instanceof Deadline) {
+                Deadline deadline = (Deadline) task;
+                if (deadline.by.toLocalDate().equals(date)) {
+                    System.out.println((i + 1) + "." + deadline);
+                    found = true;
+                }
+            } else if (task instanceof Event) {
+                Event event = (Event) task;
+                if (event.from.toLocalDate().equals(date) || event.to.toLocalDate().equals(date)) {
+                    System.out.println((i + 1) + "." + event);
+                    found = true;
                 }
             }
-            System.out.println("____________________________________________________________");
-        } else if (userInput.startsWith("list ")) {
-            // List tasks on a specific date
-            try {
-                LocalDate date = LocalDate.parse(userInput.substring(5).trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                listTasksByDate(date);
-            } catch (DateTimeParseException e) {
-                System.out.println("____________________________________________________________");
-                System.out.println(getGradientText("Einstein\nInvalid date format! Use: list yyyy-MM-dd"));
-                System.out.println("____________________________________________________________");
+        }
+        if (!found) {
+            System.out.println("No tasks found for this date.");
+        }
+    }
+
+    private String getGradientText(String text) {
+        StringBuilder gradientText = new StringBuilder();
+        int length = text.length();
+        for (int i = 0; i < length; i++) {
+            int colorIndex = (i * ORANGE_GRADIENT.length) / length;
+            gradientText.append(ORANGE_GRADIENT[colorIndex]).append(text.charAt(i));
+        }
+        gradientText.append(RESET);
+        return gradientText.toString();
+    }
+}
+
+class Storage {
+    private String filePath;
+
+    public Storage(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public ArrayList<Task> load() throws EinsteinException {
+        ArrayList<Task> tasks = new ArrayList<>();
+        try {
+            if (!Files.exists(Paths.get(filePath))) {
+                return tasks;
             }
-        }
-    }
 
-    public void markTaskAsDone(int taskIndex) throws EinsteinException {
-        if (taskIndex >= 0 && taskIndex < tasks.size()) {
-            tasks.get(taskIndex).markAsDone();
-            saveTasksToFile(); // Save tasks after marking as done
+            List<String> lines = Files.readAllLines(Paths.get(filePath));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
 
-            System.out.println("____________________________________________________________");
-            System.out.println(getGradientText("Einstein\nNice! I've marked this task as done:"));
-            System.out.println("  " + tasks.get(taskIndex));
-            System.out.println("____________________________________________________________");
-        } else {
-            throw new EinsteinException("Invalid task number! Please give me something valid!");
-        }
-    }
-
-    public void markTaskAsNotDone(int taskIndex) throws EinsteinException {
-        if (taskIndex >= 0 && taskIndex < tasks.size()) {
-            tasks.get(taskIndex).markAsNotDone();
-            System.out.println("____________________________________________________________");
-            System.out.println(getGradientText("Einstein\nAwesome, I've marked this task as not done yet, remember to get to it:"));
-            System.out.println("  " + tasks.get(taskIndex));
-            System.out.println("____________________________________________________________");
-        } else {
-            throw new EinsteinException("Invalid task number! Please give me something valid!");
-        }
-    }
-
-    public void deleteTask(int taskIndex) throws EinsteinException {
-        if (taskIndex >= 0 && taskIndex < tasks.size()) {
-            Task removedTask = tasks.remove(taskIndex);
-            saveTasksToFile();
-
-            System.out.println("____________________________________________________________");
-            System.out.println(getGradientText("Einstein\nNoted. I've atomized this task:"));
-            System.out.println("  " + removedTask);
-            System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-            System.out.println("____________________________________________________________");
-        } else {
-            throw new EinsteinException("Invalid task number! Please give me something valid!");
-        }
-    }
-
-    public void processCommands() {
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-            System.out.print("User\n> ");
-            String userInput = scanner.nextLine().trim();
-    
-            try {
-                if (userInput.equalsIgnoreCase("bye")) {
-                    farewell();
-                    break;
-                } else if (userInput.startsWith("list")) {
-                    listTasks(userInput); // Handle both "list" and "list <date>"
-                } else if (userInput.startsWith("mark ")) {
-                    handleMarkCommand(userInput);
-                } else if (userInput.startsWith("unmark ")) {
-                    handleUnmarkCommand(userInput);
-                } else if (userInput.startsWith("todo ")) {
-                    handleTodoCommand(userInput);
-                } else if (userInput.startsWith("deadline ")) {
-                    handleDeadlineCommand(userInput);
-                } else if (userInput.startsWith("event ")) {
-                    handleEventCommand(userInput);
-                } else if (userInput.startsWith("delete ")) {
-                    handleDeleteCommand(userInput);
-                } else if (userInput.equalsIgnoreCase("help")) {
-                    displayHelp();
-                } else {
-                    throw new EinsteinException("ARGH! I do not understand you, which is weird, \nbecause I usually understand most things. Invalid command!");
+            for (String line : lines) {
+                String[] parts = line.split(" \\| ");
+                if (parts.length < 3) {
+                    throw new EinsteinException("Corrupted data found in file. Skipping line: " + line);
                 }
-            } catch (EinsteinException e) {
-                System.out.println("____________________________________________________________");
-                System.out.println(getGradientText("Einstein\n" + e.getMessage()));
-                System.out.println("____________________________________________________________");
-            } catch (NumberFormatException e) {
-                System.out.println("____________________________________________________________");
-                System.out.println(getGradientText("Einstein\nInvalid task number! Please give me something valid!"));
-                System.out.println("____________________________________________________________");
+
+                String type = parts[0].trim();
+                boolean isDone = parts[1].trim().equals("1");
+                String description = parts[2].trim();
+
+                Task task;
+                switch (type) {
+                    case "T":
+                        task = new Todo(description);
+                        break;
+                    case "D":
+                        if (parts.length < 4) {
+                            throw new EinsteinException("Corrupted deadline data found. Skipping line: " + line);
+                        }
+                        LocalDateTime by = LocalDateTime.parse(parts[3].trim(), formatter);
+                        task = new Deadline(description, by);
+                        break;
+                    case "E":
+                        if (parts.length < 5) {
+                            throw new EinsteinException("Corrupted event data found. Skipping line: " + line);
+                        }
+                        LocalDateTime from = LocalDateTime.parse(parts[3].trim(), formatter);
+                        LocalDateTime to = LocalDateTime.parse(parts[4].trim(), formatter);
+                        task = new Event(description, from, to);
+                        break;
+                    default:
+                        throw new EinsteinException("Unknown task type found. Skipping line: " + line);
+                }
+
+                if (isDone) {
+                    task.markAsDone();
+                }
+                tasks.add(task);
             }
+        } catch (IOException | DateTimeParseException e) {
+            throw new EinsteinException("Error loading tasks from file: " + e.getMessage());
         }
-        scanner.close();
+        return tasks;
     }
 
-    private void handleMarkCommand(String userInput) throws EinsteinException {
-        try {
-            int taskIndex = Integer.parseInt(userInput.substring(5).trim()) - 1;
-            markTaskAsDone(taskIndex);
-        } catch (NumberFormatException e) {
-            throw new EinsteinException("Invalid task number! Please give me something valid!");
-        }
-    }
-
-    private void handleUnmarkCommand(String userInput) throws EinsteinException {
-        try {
-            int taskIndex = Integer.parseInt(userInput.substring(7).trim()) - 1;
-            markTaskAsNotDone(taskIndex);
-        } catch (NumberFormatException e) {
-            throw new EinsteinException("Invalid task number! Please give me something valid!");
-        }
-    }
-
-    private void handleTodoCommand(String userInput) throws EinsteinException {
-        String description = userInput.substring(5).trim();
-        if (description.isEmpty()) {
-            throw new EinsteinException("Nein! You have to give a description to your todo.");
-        }
-        addTask(new Todo(description));
-    }
-
-    private void handleDeadlineCommand(String userInput) throws EinsteinException {
-        String[] parts = userInput.substring(9).split("/by", 2);
-        if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
-            throw new EinsteinException("Invalid deadline format! Use: deadline <description> /by <date>");
-        }
-        String description = parts[0].trim();
-        LocalDateTime by = parseDateTime(parts[1].trim());
-        addTask(new Deadline(description, by));
-    }
-
-    private void handleEventCommand(String userInput) throws EinsteinException {
-        String[] parts = userInput.substring(6).split("/from|/to", 3);
-        if (parts.length < 3 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty() || parts[2].trim().isEmpty()) {
-            throw new EinsteinException("Invalid event format! Use: event <description> /from <start> /to <end>");
-        }
-        String description = parts[0].trim();
-        LocalDateTime from = parseDateTime(parts[1].trim());
-        LocalDateTime to = parseDateTime(parts[2].trim());
-        addTask(new Event(description, from, to));
-    }
-
-    public void handleDeleteCommand(String userInput) throws EinsteinException {
-        try {
-            if (tasks.size() == 0) {
-                throw new EinsteinException("We don't have any tasks yet, my dear friend. Add some first!");
-            }
-            String taskNumberStr = userInput.substring(7).trim();
-            if (taskNumberStr.isEmpty()) {
-                throw new EinsteinException("Nein! You must provide a task number to delete. \nUse: delete <task number>");
-            }
-            int taskIndex = Integer.parseInt(taskNumberStr) - 1;
-            deleteTask(taskIndex);
-        } catch (NumberFormatException e) {
-            throw new EinsteinException("Invalid task number! Please give me something valid!");
-        }
-    }
-
-    private void saveTasksToFile() {
+    public void save(ArrayList<Task> tasks) throws EinsteinException {
         try {
             Files.createDirectories(Paths.get("data"));
             StringBuilder data = new StringBuilder();
@@ -335,77 +265,198 @@ public class Einstein {
                         .append(" | ").append(event.from.format(formatter)).append(" | ").append(event.to.format(formatter)).append("\n");
                 }
             }
-            Files.write(Paths.get(DATA_FILE_PATH), data.toString().getBytes());
+            Files.write(Paths.get(filePath), data.toString().getBytes());
         } catch (IOException e) {
-            System.out.println("____________________________________________________________");
-            System.out.println(getGradientText("Einstein\nError saving tasks to file: " + e.getMessage()));
-            System.out.println("____________________________________________________________");
+            throw new EinsteinException("Error saving tasks to file: " + e.getMessage());
+        }
+    }
+}
+
+class TaskList {
+    private ArrayList<Task> tasks;
+
+    public TaskList() {
+        this.tasks = new ArrayList<>();
+    }
+
+    public TaskList(ArrayList<Task> tasks) {
+        this.tasks = tasks;
+    }
+
+    public void addTask(Task task) {
+        tasks.add(task);
+    }
+
+    public void deleteTask(int index) throws EinsteinException {
+        if (index < 0 || index >= tasks.size()) {
+            throw new EinsteinException("Invalid task number! Please give me something valid!");
+        }
+        tasks.remove(index);
+    }
+
+    public void markTaskAsDone(int index) throws EinsteinException {
+        if (index < 0 || index >= tasks.size()) {
+            throw new EinsteinException("Invalid task number! Please give me something valid!");
+        }
+        tasks.get(index).markAsDone();
+    }
+
+    public void markTaskAsNotDone(int index) throws EinsteinException {
+        if (index < 0 || index >= tasks.size()) {
+            throw new EinsteinException("Invalid task number! Please give me something valid!");
+        }
+        tasks.get(index).markAsNotDone();
+    }
+
+    public ArrayList<Task> getTasks() {
+        return tasks;
+    }
+
+    public int getTaskCount() {
+        return tasks.size();
+    }
+}
+
+interface Command {
+    void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException;
+    boolean isExit();
+}
+
+class ExitCommand implements Command {
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        ui.showFarewell();
+    }
+
+    @Override
+    public boolean isExit() {
+        return true;
+    }
+}
+
+class ListCommand implements Command {
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        ui.showTaskList(tasks.getTasks());
+    }
+
+    @Override
+    public boolean isExit() {
+        return false;
+    }
+}
+
+class ListByDateCommand implements Command {
+    private LocalDate date;
+
+    public ListByDateCommand(String fullCommand) throws EinsteinException {
+        try {
+            this.date = LocalDate.parse(fullCommand.substring(5).trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        } catch (DateTimeParseException e) {
+            throw new EinsteinException("Invalid date format! Use: list yyyy-MM-dd");
         }
     }
 
-    private void loadTasksFromFile() {
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        ui.showTasksByDate(tasks.getTasks(), date);
+    }
+
+    @Override
+    public boolean isExit() {
+        return false;
+    }
+}
+
+class MarkCommand implements Command {
+    private int taskIndex;
+
+    public MarkCommand(String fullCommand) throws EinsteinException {
         try {
-            if (!Files.exists(Paths.get(DATA_FILE_PATH))) {
-                System.out.println(getGradientText("Einstein\nNo existing tasks found. Starting with an empty list."));
-                return;
-            }
-
-            List<String> lines = Files.readAllLines(Paths.get(DATA_FILE_PATH));
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
-
-            for (String line : lines) {
-                String[] parts = line.split(" \\| ");
-                if (parts.length < 3) {
-                    System.out.println(getGradientText("Einstein\nCorrupted data found in file. Skipping line: " + line));
-                    continue;
-                }
-
-                String type = parts[0].trim();
-                boolean isDone = parts[1].trim().equals("1");
-                String description = parts[2].trim();
-
-                Task task;
-                switch (type) {
-                    case "T":
-                        task = new Todo(description);
-                        break;
-                    case "D":
-                        if (parts.length < 4) {
-                            System.out.println(getGradientText("Einstein\nCorrupted deadline data found. Skipping line: " + line));
-                            continue;
-                        }
-                        LocalDateTime by = LocalDateTime.parse(parts[3].trim(), formatter);
-                        task = new Deadline(description, by);
-                        break;
-                    case "E":
-                        if (parts.length < 5) {
-                            System.out.println(getGradientText("Einstein\nCorrupted event data found. Skipping line: " + line));
-                            continue;
-                        }
-                        LocalDateTime from = LocalDateTime.parse(parts[3].trim(), formatter);
-                        LocalDateTime to = LocalDateTime.parse(parts[4].trim(), formatter);
-                        task = new Event(description, from, to);
-                        break;
-                    default:
-                        System.out.println(getGradientText("Einstein\nUnknown task type found. Skipping line: " + line));
-                        continue;
-                }
-
-                if (isDone) {
-                    task.markAsDone();
-                }
-                tasks.add(task);
-            }
-        } catch (IOException | DateTimeParseException e) {
-            System.out.println("____________________________________________________________");
-            System.out.println(getGradientText("Einstein\nError loading tasks from file: " + e.getMessage()));
-            System.out.println("____________________________________________________________");
+            this.taskIndex = Integer.parseInt(fullCommand.substring(5).trim()) - 1;
+        } catch (NumberFormatException e) {
+            throw new EinsteinException("Invalid task number! Please give me something valid!");
         }
+    }
+
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        tasks.markTaskAsDone(taskIndex);
+        storage.save(tasks.getTasks());
+        ui.showLine();
+        ui.showTaskList(tasks.getTasks());
+    }
+
+    @Override
+    public boolean isExit() {
+        return false;
+    }
+}
+
+class UnmarkCommand implements Command {
+    private int taskIndex;
+
+    public UnmarkCommand(String fullCommand) throws EinsteinException {
+        try {
+            this.taskIndex = Integer.parseInt(fullCommand.substring(7).trim()) - 1;
+        } catch (NumberFormatException e) {
+            throw new EinsteinException("Invalid task number! Please give me something valid!");
+        }
+    }
+
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        tasks.markTaskAsNotDone(taskIndex);
+        storage.save(tasks.getTasks());
+        ui.showLine();
+        ui.showTaskList(tasks.getTasks());
+    }
+
+    @Override
+    public boolean isExit() {
+        return false;
+    }
+}
+
+class AddTodoCommand implements Command {
+    private String description;
+
+    public AddTodoCommand(String fullCommand) throws EinsteinException {
+        this.description = fullCommand.substring(5).trim();
+        if (description.isEmpty()) {
+            throw new EinsteinException("Nein! You have to give a description to your todo.");
+        }
+    }
+
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        Task task = new Todo(description);
+        tasks.addTask(task);
+        storage.save(tasks.getTasks());
+        ui.showTaskAdded(task, tasks.getTaskCount());
+    }
+
+    @Override
+    public boolean isExit() {
+        return false;
+    }
+}
+
+class AddDeadlineCommand implements Command {
+    private String description;
+    private LocalDateTime by;
+
+    public AddDeadlineCommand(String fullCommand) throws EinsteinException {
+        String[] parts = fullCommand.substring(9).split("/by", 2);
+        if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
+            throw new EinsteinException("Invalid deadline format! Use: deadline <description> /by <date>");
+        }
+        this.description = parts[0].trim();
+        this.by = parseDateTime(parts[1].trim());
     }
 
     private LocalDateTime parseDateTime(String dateTimeStr) throws EinsteinException {
         try {
-            // Try parsing with date and time format (e.g., "2/12/2019 1800")
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
             return LocalDateTime.parse(dateTimeStr, formatter);
         } catch (DateTimeParseException e) {
@@ -413,37 +464,89 @@ public class Einstein {
         }
     }
 
-    public void listTasksByDate(LocalDate date) {
-        System.out.println("____________________________________________________________");
-        System.out.println(getGradientText("Einstein\nHere are the tasks occurring on " + date.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":"));
-    
-        boolean found = false;
-        for (int i = 0; i < tasks.size(); i++) {
-            Task task = tasks.get(i);
-            if (task instanceof Deadline) {
-                Deadline deadline = (Deadline) task;
-                if (deadline.by.toLocalDate().equals(date)) {
-                    System.out.println((i + 1) + "." + deadline);
-                    found = true;
-                }
-            } else if (task instanceof Event) {
-                Event event = (Event) task;
-                if (event.from.toLocalDate().equals(date) || event.to.toLocalDate().equals(date)) {
-                    System.out.println((i + 1) + "." + event);
-                    found = true;
-                }
-            }
-        }
-    
-        if (!found) {
-            System.out.println("No tasks found for this date.");
-        }
-        System.out.println("____________________________________________________________");
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        Task task = new Deadline(description, by);
+        tasks.addTask(task);
+        storage.save(tasks.getTasks());
+        ui.showTaskAdded(task, tasks.getTaskCount());
     }
 
-    public void displayHelp() {
-        System.out.println("____________________________________________________________");
-        System.out.println(getGradientText("Einstein\nHere are the commands I understand:"));
+    @Override
+    public boolean isExit() {
+        return false;
+    }
+}
+
+class AddEventCommand implements Command {
+    private String description;
+    private LocalDateTime from;
+    private LocalDateTime to;
+
+    public AddEventCommand(String fullCommand) throws EinsteinException {
+        String[] parts = fullCommand.substring(6).split("/from|/to", 3);
+        if (parts.length < 3 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty() || parts[2].trim().isEmpty()) {
+            throw new EinsteinException("Invalid event format! Use: event <description> /from <start> /to <end>");
+        }
+        this.description = parts[0].trim();
+        this.from = parseDateTime(parts[1].trim());
+        this.to = parseDateTime(parts[2].trim());
+    }
+
+    private LocalDateTime parseDateTime(String dateTimeStr) throws EinsteinException {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
+            return LocalDateTime.parse(dateTimeStr, formatter);
+        } catch (DateTimeParseException e) {
+            throw new EinsteinException("Invalid date/time format! Use: dd/MM/yyyy HHmm (e.g., 2/12/2019 1800)");
+        }
+    }
+
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        Task task = new Event(description, from, to);
+        tasks.addTask(task);
+        storage.save(tasks.getTasks());
+        ui.showTaskAdded(task, tasks.getTaskCount());
+    }
+
+    @Override
+    public boolean isExit() {
+        return false;
+    }
+}
+
+class DeleteCommand implements Command {
+    private int taskIndex;
+
+    public DeleteCommand(String fullCommand) throws EinsteinException {
+        try {
+            this.taskIndex = Integer.parseInt(fullCommand.substring(7).trim()) - 1;
+        } catch (NumberFormatException e) {
+            throw new EinsteinException("Invalid task number! Please give me something valid!");
+        }
+    }
+
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        Task removedTask = tasks.getTasks().get(taskIndex);
+        tasks.deleteTask(taskIndex);
+        storage.save(tasks.getTasks());
+        ui.showLine();
+        ui.showTaskList(tasks.getTasks());
+    }
+
+    @Override
+    public boolean isExit() {
+        return false;
+    }
+}
+
+class HelpCommand implements Command {
+    @Override
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        ui.showLine();
+        System.out.println("Here are the commands I understand:");
         System.out.println("1. todo <description> - Add a todo task.");
         System.out.println("   Example: todo read book");
         System.out.println("2. deadline <description> /by <date> - Add a deadline task.");
@@ -464,24 +567,78 @@ public class Einstein {
         System.out.println("   Example: help");
         System.out.println("10. bye - Exit the program.");
         System.out.println("   Example: bye");
-        System.out.println("____________________________________________________________");
+        ui.showLine();
     }
 
-    // helper method to apply gradient colour to text (only for ASCII art) - created by DeepSeek
-    private String getGradientText(String text) {
-        StringBuilder gradientText = new StringBuilder();
-        int length = text.length();
-        for (int i = 0; i < length; i++) {
-            int colorIndex = (i * ORANGE_GRADIENT.length) / length;
-            gradientText.append(ORANGE_GRADIENT[colorIndex]).append(text.charAt(i));
+    @Override
+    public boolean isExit() {
+        return false;
+    }
+}
+
+ class Parser {
+    public static Command parse(String fullCommand) throws EinsteinException {
+        if (fullCommand.equalsIgnoreCase("bye")) {
+            return new ExitCommand();
+        } else if (fullCommand.equalsIgnoreCase("list")) {
+            return new ListCommand();
+        } else if (fullCommand.startsWith("list ")) {
+            return new ListByDateCommand(fullCommand);
+        } else if (fullCommand.startsWith("mark ")) {
+            return new MarkCommand(fullCommand);
+        } else if (fullCommand.startsWith("unmark ")) {
+            return new UnmarkCommand(fullCommand);
+        } else if (fullCommand.startsWith("todo ")) {
+            return new AddTodoCommand(fullCommand);
+        } else if (fullCommand.startsWith("deadline ")) {
+            return new AddDeadlineCommand(fullCommand);
+        } else if (fullCommand.startsWith("event ")) {
+            return new AddEventCommand(fullCommand);
+        } else if (fullCommand.startsWith("delete ")) {
+            return new DeleteCommand(fullCommand);
+        } else if (fullCommand.equalsIgnoreCase("help")) {
+            return new HelpCommand();
+        } else {
+            throw new EinsteinException("ARGH! I do not understand you, which is weird, \nbecause I usually understand most things. Invalid command!");
         }
-        gradientText.append(RESET);
-        return gradientText.toString();
+    }
+}
+
+public class Einstein {
+    private Storage storage;
+    private TaskList tasks;
+    private Ui ui;
+
+    public Einstein(String filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
+        try {
+            tasks = new TaskList(storage.load());
+        } catch (EinsteinException e) {
+            ui.showError(e.getMessage());
+            tasks = new TaskList();
+        }
+    }
+
+    public void run() {
+        ui.showWelcome();
+        boolean isExit = false;
+        while (!isExit) {
+            try {
+                String fullCommand = ui.readCommand();
+                ui.showLine();
+                Command c = Parser.parse(fullCommand);
+                c.execute(tasks, ui, storage);
+                isExit = c.isExit();
+            } catch (EinsteinException e) {
+                ui.showError(e.getMessage());
+            } finally {
+                ui.showLine();
+            }
+        }
     }
 
     public static void main(String[] args) {
-        Einstein einstein = new Einstein();
-        einstein.greeting();
-        einstein.processCommands();
+        new Einstein("data/duke.txt").run();
     }
 }
