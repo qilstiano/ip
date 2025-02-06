@@ -19,31 +19,13 @@ import einstein.task.Event;
 import einstein.task.Deadline;
 import einstein.exception.EinsteinException;
 
-/**
- * Handles loading and saving of tasks to and from a file.
- * This class is responsible for reading tasks from storage upon startup
- * and writing them back when the application exits.
- */
 public class Storage {
     private String filePath;
 
-    /**
-     * Creates a new {@code Storage} instance with the specified file path.
-     *
-     * @param filePath The path to the file where tasks are stored.
-     */
     public Storage(String filePath) {
-
         this.filePath = filePath;
     }
 
-    /**
-     * Loads tasks from the storage file.
-     * If the file does not exist, an empty task list is returned.
-     *
-     * @return An {@code ArrayList<Task>} containing the loaded tasks.
-     * @throws EinsteinException If there is an issue reading the file or parsing data.
-     */
     public ArrayList<Task> load() throws EinsteinException {
         ArrayList<Task> tasks = new ArrayList<>();
         try {
@@ -99,13 +81,6 @@ public class Storage {
         return tasks;
     }
 
-    /**
-     * Saves the given list of tasks to the storage file.
-     * If the file or its parent directories do not exist, they are created.
-     *
-     * @param tasks The list of tasks to be saved.
-     * @throws EinsteinException If there is an error writing to the file.
-     */
     public void save(ArrayList<Task> tasks) throws EinsteinException {
         try {
             Files.createDirectories(Paths.get("data"));
