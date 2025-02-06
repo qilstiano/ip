@@ -13,7 +13,22 @@ import einstein.command.AddEventCommand;
 import einstein.command.DeleteCommand;
 import einstein.command.HelpCommand;
 
+/**
+ * Parses user input and returns the corresponding command object.
+ * This class is responsible for interpreting commands entered by the user
+ * and mapping them to their respective execution logic.
+ */
 public class Parser {
+
+    /**
+     * Parses the user input command and returns the appropriate {@code Command} object.
+     * The method matches the input with predefined commands and creates an instance of
+     * the respective command class.
+     *
+     * @param fullCommand The full command string entered by the user.
+     * @return A {@code Command} object corresponding to the user input.
+     * @throws EinsteinException If the input command is invalid or not recognized.
+     */
     public static Command parse(String fullCommand) throws EinsteinException {
         if (fullCommand.equalsIgnoreCase("bye")) {
             return new ExitCommand();
