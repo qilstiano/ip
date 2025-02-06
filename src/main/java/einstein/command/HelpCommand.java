@@ -1,6 +1,5 @@
 package einstein.command;
 
-
 import einstein.exception.EinsteinException;
 import einstein.storage.TaskList;
 import einstein.storage.Storage;
@@ -31,6 +30,7 @@ public class HelpCommand implements Command {
         System.out.println("   Example: help");
         System.out.println("10. bye - Exit the program.");
         System.out.println("   Example: bye");
+
         ui.showLine();
     }
 
