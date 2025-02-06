@@ -1,5 +1,6 @@
 package einstein.parser;
 
+import einstein.command.FindCommand;
 import einstein.exception.EinsteinException;
 import einstein.command.Command;
 import einstein.command.ExitCommand;
@@ -12,6 +13,7 @@ import einstein.command.AddDeadlineCommand;
 import einstein.command.AddEventCommand;
 import einstein.command.DeleteCommand;
 import einstein.command.HelpCommand;
+import einstein.command.FindCommand;
 
 /**
  * Parses user input and returns the corresponding command object.
@@ -50,6 +52,8 @@ public class Parser {
             return new DeleteCommand(fullCommand);
         } else if (fullCommand.equalsIgnoreCase("help")) {
             return new HelpCommand();
+        } else if (fullCommand.startsWith("find ")) {
+            return new FindCommand(fullCommand);
         } else {
             throw new EinsteinException("ARGH! I do not understand you, which is weird, \nbecause I usually understand most things. Invalid command!");
         }
