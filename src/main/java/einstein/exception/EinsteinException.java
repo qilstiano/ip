@@ -12,6 +12,6 @@ public class EinsteinException extends Exception {
      * @param message The error message describing the exception.
      */
     public EinsteinException(String message) {
-      super(message);
-  }
+        super(message);
+    }
 }
