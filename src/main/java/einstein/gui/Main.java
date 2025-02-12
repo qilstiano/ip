@@ -26,6 +26,12 @@ public class Main extends Application {
             stage.setScene(scene);
             fxmlLoader.<MainWindow>getController().setEinstein(einstein);  // inject the Duke instance
             stage.show();
+
+            stage.setMinHeight(220);
+            stage.setMinWidth(417);
+            // stage.setMaxWidth(417); // Add this if you didn't automatically resize elements
+            fxmlLoader.<MainWindow>getController().setEinstein(einstein);
+            stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
