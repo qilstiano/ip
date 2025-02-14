@@ -46,7 +46,7 @@ public class MainWindow extends AnchorPane {
         String response = einstein.getResponse(input);
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
-                DialogBox.getDukeDialog(response, einsteinImage)
+                DialogBox.getEinsteinDialog(response, einsteinImage)
         );
         userInput.clear();
     }

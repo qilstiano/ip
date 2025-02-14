@@ -36,7 +36,7 @@ public class FindCommand implements Command {
      * @param storage The storage handler (not used in search operation).
      */
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) {
+    public String execute(TaskList tasks, Ui ui, Storage storage) {
         ArrayList<Task> matchingTasks = new ArrayList<>();
         for (Task task : tasks.getTasks()) {
             if (task.description.contains(keyword)) {
@@ -44,11 +44,10 @@ public class FindCommand implements Command {
             }
         }
 
-        ui.showLine();
         if (matchingTasks.isEmpty()) {
-            ui.showError("No matching tasks found!");
+            return ui.showError("No matching tasks found!");
         } else {
-            ui.showTaskList(matchingTasks);
+            return ui.showTaskList(matchingTasks);
         }
     }
 

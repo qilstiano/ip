@@ -23,8 +23,8 @@ public class ListByDateCommand implements Command {
     }
 
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
-        ui.showTasksByDate(tasks.getTasks(), date);
+    public String execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        return ui.showTasksByDate(tasks.getTasks(), date);
     }
 
     @Override

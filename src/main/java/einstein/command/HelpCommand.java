@@ -7,31 +7,33 @@ import einstein.ui.Ui;
 
 public class HelpCommand implements Command {
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
-        ui.showLine();
-        System.out.println("Here are the commands I understand:");
-        System.out.println("1. todo <description> - Add a todo task.");
-        System.out.println("   Example: todo read book");
-        System.out.println("2. deadline <description> /by <date> - Add a deadline task.");
-        System.out.println("   Example: deadline return book /by 2/12/2019 1800");
-        System.out.println("3. event <description> /from <start> /to <end> - Add an event task.");
-        System.out.println("   Example: event project meeting /from 2/12/2019 1400 /to 2/12/2019 1600");
-        System.out.println("4. list - List all tasks.");
-        System.out.println("   Example: list");
-        System.out.println("5. list <date> - List tasks occurring on a specific date (format: yyyy-MM-dd).");
-        System.out.println("   Example: list 2019-12-02");
-        System.out.println("6. mark <task number> - Mark a task as done.");
-        System.out.println("   Example: mark 1");
-        System.out.println("7. unmark <task number> - Mark a task as not done.");
-        System.out.println("   Example: unmark 1");
-        System.out.println("8. delete <task number> - Delete a task.");
-        System.out.println("   Example: delete 1");
-        System.out.println("9. help - Display this help message.");
-        System.out.println("   Example: help");
-        System.out.println("10. bye - Exit the program.");
-        System.out.println("   Example: bye");
+    public String execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        StringBuilder output = new StringBuilder();
+        output.append(ui.showLine()).append("\n");
+        output.append("Here are the commands I understand:\n");
+        output.append("1. todo <description> - Add a todo task.\n");
+        output.append("   Example: todo read book\n");
+        output.append("2. deadline <description> /by <date> - Add a deadline task.\n");
+        output.append("   Example: deadline return book /by 2/12/2019 1800\n");
+        output.append("3. event <description> /from <start> /to <end> - Add an event task.\n");
+        output.append("   Example: event project meeting /from 2/12/2019 1400 /to 2/12/2019 1600\n");
+        output.append("4. list - List all tasks.\n");
+        output.append("   Example: list\n");
+        output.append("5. list <date> - List tasks occurring on a specific date (format: yyyy-MM-dd).\n");
+        output.append("   Example: list 2019-12-02\n");
+        output.append("6. mark <task number> - Mark a task as done.\n");
+        output.append("   Example: mark 1\n");
+        output.append("7. unmark <task number> - Mark a task as not done.\n");
+        output.append("   Example: unmark 1\n");
+        output.append("8. delete <task number> - Delete a task.\n");
+        output.append("   Example: delete 1\n");
+        output.append("9. help - Display this help message.\n");
+        output.append("   Example: help\n");
+        output.append("10. bye - Exit the program.\n");
+        output.append("   Example: bye\n");
+        output.append(ui.showLine());
 
-        ui.showLine();
+        return output.toString();
     }
 
     @Override

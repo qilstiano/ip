@@ -18,11 +18,11 @@ public class AddTodoCommand implements Command {
     }
 
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+    public String execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
         Task task = new Todo(description);
         tasks.addTask(task);
         storage.save(tasks.getTasks());
-        ui.showTaskAdded(task, tasks.getTaskCount());
+        return ui.showTaskAdded(task, tasks.getTaskCount());
     }
 
     @Override
