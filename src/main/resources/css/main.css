@@ -1,0 +1,51 @@
+.root {
+    main-color: #1e1e1e; /* Dark background color */
+    accent-color: #ff8c42; /* Orange accent color */
+    -fx-background-color: main-color;
+}
+
+.text-field {
+    -fx-background-color: #2d2d2d; /* Darker background for text fields */
+    -fx-text-fill: #ffffff; /* White text */
+    -fx-font: 20px "Microsoft Sans Serif";
+    -fx-prompt-text-fill: #666666; /* Gray placeholder text */
+}
+
+.button {
+    -fx-background-color: accent-color; /* Orange accent for buttons */
+    -fx-text-fill: #1e1e1e; /* Dark text */
+    -fx-font: italic bold 16px "Microsoft Sans Serif";
+    -transition: -fx-background-color 0.8s ease, -fx-font-size 0.8s ease; /* Add smooth transitions */
+}
+
+.button:hover {
+    -fx-background-color: #ffa64d; /* Lighter orange on hover */
+    -fx-font-size: 18px;
+}
+
+.button:pressed {
+    -fx-background-color: #e67300; /* Darker orange when pressed */
+    -fx-font-size: 20px;
+}
+
+.scroll-pane,
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar {
+    -fx-font-size: 10px;
+    -fx-background-color: main-color;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: accent-color; /* Orange scrollbar thumb */
+    -fx-background-radius: 1em;
+}
+
+/* Hides the increment and decrement buttons. */
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
+}

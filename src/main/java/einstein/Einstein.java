@@ -40,6 +40,18 @@ public class Einstein {
         }
     }
 
+    /**
+     * Generates a response for the user's chat message.
+     */
+    public String getResponse(String input) {
+        try {
+            Command c = Parser.parse(input);
+            return c.execute(tasks, ui, storage);
+        } catch (EinsteinException e) {
+            return ui.showError(e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
         new Einstein("data/einstein.txt").run();
     }

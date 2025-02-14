@@ -26,34 +26,34 @@ public class Ui {
     /**
      * Displays the welcome message along with a chatbot ASCII art.
      */
-    public void showWelcome() {
+    public String showWelcome() {
         String chatbotAscii = "         _                   _           _            \r\n" + //
                 "        (_)                 / |_        (_)           \r\n" + //
                 " .---.  __   _ .--.   .--. `| |-'.---.  __   _ .--.   \r\n" + //
                 "/ /__\\\\[  | [ `.-. | ( (`\\] | | / /__\\\\[  | [ `.-. |  \r\n" + //
-                "| \\__., | |  | | | |  `'.'. | |,| \\__., | |  | | | |  \r\n" + //
+                "| \\_., | |  | | | |  `'.'. | |,| \\_., | |  | | | |  \r\n" + //
                 " '.__.'[___][___||__][\\__) )\\__/ '.__.'[___][___||__]  v0.1.1\r\n" + //
                 "                                                     ";
-        System.out.println("____________________________________________________________");
-        System.out.println(getGradientText(chatbotAscii));
-        System.out.println(getGradientText("\nEinstein\nGuten tag, Einstein here! What can I do for you?"));
-        System.out.println("____________________________________________________________");
+        return "____________________________________________________________\n"
+                + chatbotAscii + "\n"
+                + "\nEinstein\nGuten tag, Einstein here! What can I do for you?" + "\n"
+                + "____________________________________________________________";
     }
 
     /**
      * Displays the farewell message when the user exits.
      */
-    public void showFarewell() {
-        System.out.println("____________________________________________________________");
-        System.out.println(getGradientText("Einstein\n\tBye, hope to see you again soon!"));
-        System.out.println("____________________________________________________________");
+    public String showFarewell() {
+        return "____________________________________________________________\n"
+                + "Einstein\n\tBye, hope to see you again soon!" + "\n"
+                + "____________________________________________________________";
     }
 
     /**
      * Displays a line to separate sections of output.
      */
-    public void showLine() {
-        System.out.println("____________________________________________________________");
+    public String showLine() {
+        return "____________________________________________________________";
     }
 
     /**
@@ -61,8 +61,8 @@ public class Ui {
      *
      * @param message The error message to be displayed.
      */
-    public void showError(String message) {
-        System.out.println(getGradientText("Einstein\n" + message));
+    public String showError(String message) {
+        return "Einstein\n" + message;
     }
 
     /**
@@ -81,10 +81,10 @@ public class Ui {
      * @param task The task that was added.
      * @param taskCount The total number of tasks in the list after adding the task.
      */
-    public void showTaskAdded(Task task, int taskCount) {
-        System.out.println(getGradientText("Einstein\nGot it. I've added this task:"));
-        System.out.println("  " + task);
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
+    public String showTaskAdded(Task task, int taskCount) {
+        return "Einstein\nGot it. I've added this task:" + "\n"
+                + "  " + task + "\n"
+                + "Now you have " + taskCount + " tasks in the list.";
     }
 
     /**
@@ -92,15 +92,16 @@ public class Ui {
      *
      * @param tasks The list of tasks to be displayed.
      */
-    public void showTaskList(ArrayList<Task> tasks) {
-        System.out.println(getGradientText("Einstein\nHere are the tasks in your list:"));
+    public String showTaskList(ArrayList<Task> tasks) {
+        StringBuilder output = new StringBuilder("Einstein\nHere are the tasks in your list:\n");
         if (tasks.isEmpty()) {
-            System.out.println("Hmmm, didn't find any tasks. Add some tasks!");
+            output.append("Hmmm, didn't find any tasks. Add some tasks!");
         } else {
             for (int i = 0; i < tasks.size(); i++) {
-                System.out.println((i + 1) + "." + tasks.get(i));
+                output.append((i + 1)).append(".").append(tasks.get(i)).append("\n");
             }
         }
+        return output.toString();
     }
 
     /**
@@ -109,44 +110,29 @@ public class Ui {
      * @param tasks The list of tasks to be checked for the specified date.
      * @param date The date to filter the tasks by.
      */
-    public void showTasksByDate(ArrayList<Task> tasks, LocalDate date) {
-        System.out.println(getGradientText("Einstein\nHere are the tasks occurring on " + date.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":"));
+    public String showTasksByDate(ArrayList<Task> tasks, LocalDate date) {
+        StringBuilder output = new StringBuilder("Einstein\nHere are the tasks occurring on "
+                + date.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":\n");
         boolean found = false;
         for (int i = 0; i < tasks.size(); i++) {
             Task task = tasks.get(i);
             if (task instanceof Deadline) {
                 Deadline deadline = (Deadline) task;
                 if (deadline.by.toLocalDate().equals(date)) {
-                    System.out.println((i + 1) + "." + deadline);
+                    output.append((i + 1)).append(".").append(deadline).append("\n");
                     found = true;
                 }
             } else if (task instanceof Event) {
                 Event event = (Event) task;
                 if (event.from.toLocalDate().equals(date) || event.to.toLocalDate().equals(date)) {
-                    System.out.println((i + 1) + "." + event);
+                    output.append((i + 1)).append(".").append(event).append("\n");
                     found = true;
                 }
             }
         }
         if (!found) {
-            System.out.println("No tasks found for this date.");
+            output.append("No tasks found for this date.");
         }
-    }
-
-    /**
-     * Applies a color gradient to the given text.
-     *
-     * @param text The text to which the gradient will be applied.
-     * @return The text with the applied gradient.
-     */
-    private String getGradientText(String text) {
-        StringBuilder gradientText = new StringBuilder();
-        int length = text.length();
-        for (int i = 0; i < length; i++) {
-            int colorIndex = (i * ORANGE_GRADIENT.length) / length;
-            gradientText.append(ORANGE_GRADIENT[colorIndex]).append(text.charAt(i));
-        }
-        gradientText.append(RESET);
-        return gradientText.toString();
+        return output.toString();
     }
 }

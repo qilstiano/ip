@@ -17,11 +17,10 @@ public class UnmarkCommand implements Command {
     }
 
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+    public String execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
         tasks.markTaskAsNotDone(taskIndex);
         storage.save(tasks.getTasks());
-        ui.showLine();
-        ui.showTaskList(tasks.getTasks());
+        return ui.showTaskList(tasks.getTasks());
     }
 
     @Override
