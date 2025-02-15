@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'checkstyle'
 }
 
 repositories {
@@ -45,6 +46,9 @@ application {
     mainClass.set("einstein.gui.Launcher")
 }
 
+checkstyle {
+    toolVersion = '10.2'
+}
 
 shadowJar {
     archiveBaseName = "Einstein"
