@@ -4,6 +4,7 @@ import einstein.exception.EinsteinException;
 import einstein.storage.Storage;
 import einstein.storage.TaskList;
 import einstein.ui.Ui;
+import javafx.application.Platform;
 
 /**
  * Represents a command to exit the Einstein task management system.
@@ -11,7 +12,7 @@ import einstein.ui.Ui;
 public class ExitCommand implements Command {
 
     /**
-     * Executes the exit command, displaying a farewell message.
+     * Executes the exit command, displaying a farewell message and closing the application.
      *
      * @param tasks The current list of tasks (not used in this command).
      * @param ui The user interface for displaying messages.
@@ -21,7 +22,18 @@ public class ExitCommand implements Command {
      */
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
-        return ui.showFarewell();
+        assert ui != null : "UI cannot be null";
+
+        String farewellMessage = ui.showFarewell();
+        assert farewellMessage != null && !farewellMessage.isEmpty() : "Farewell message should not be null or empty";
+
+        // Schedule the application to exit
+        Platform.runLater(() -> {
+            Platform.exit();
+            System.exit(0);
+        });
+
+        return farewellMessage;
     }
 
     /**
