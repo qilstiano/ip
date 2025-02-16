@@ -43,9 +43,7 @@ public class Ui {
      * Displays the farewell message when the user exits.
      */
     public String showFarewell() {
-        return "____________________________________________________________\n"
-                + "Bye, hope to see you again soon!" + "\n"
-                + "____________________________________________________________";
+        return "Bye, hope to see you again soon!";
     }
 
     /**

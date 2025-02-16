@@ -2,7 +2,7 @@ package einstein.parser;
 
 import einstein.command.AddDeadlineCommand;
 import einstein.command.AddEventCommand;
-import einstein.command.AddTodoCommand;
+import einstein.command.AddMultipleTodosCommand;
 import einstein.command.Command;
 import einstein.command.DeleteCommand;
 import einstein.command.ExitCommand;
@@ -43,7 +43,7 @@ public class Parser {
         } else if (fullCommand.startsWith("unmark ")) {
             return new UnmarkCommand(fullCommand);
         } else if (fullCommand.startsWith("todo ")) {
-            return new AddTodoCommand(fullCommand);
+            return parseTodoCommand(fullCommand);
         } else if (fullCommand.startsWith("deadline ")) {
             return new AddDeadlineCommand(fullCommand);
         } else if (fullCommand.startsWith("event ")) {
@@ -58,5 +58,22 @@ public class Parser {
             throw new EinsteinException("ARGH! I do not understand you, which is weird, "
                     + "\nbecause I usually understand most things. Invalid command!");
         }
+    }
+
+    /**
+     * Parses the to-do command for multiple todos.
+     *
+     * @param fullCommand The full command string entered by the user.
+     * @return A {@code Command} object corresponding to the user input.
+     * @throws EinsteinException If the input command is invalid or not recognized.
+     */
+    private static Command parseTodoCommand(String fullCommand) throws EinsteinException {
+        String args = fullCommand.substring(5).trim();
+        // Handle multiple todos
+        String[] todos = args.split(","); // Split by commas
+        if (todos.length == 0) {
+            throw new EinsteinException("Nein! You must provide at least one task description.");
+        }
+        return new AddMultipleTodosCommand(todos);
     }
 }
