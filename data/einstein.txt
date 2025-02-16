@@ -3,3 +3,5 @@ T | 0 | Task2
 T | 0 | Task3
 T | 0 | Task4
 T | 0 | Task5
+T | 0 | Task6
+T | 0 | Task7

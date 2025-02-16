@@ -27,12 +27,15 @@ public class AddDeadlineCommand implements Command {
      * @throws EinsteinException If the command format is invalid or the date/time is improperly formatted.
      */
     public AddDeadlineCommand(String fullCommand) throws EinsteinException {
+        assert fullCommand != null : "Full command cannot be null";
+        assert fullCommand.startsWith("deadline") : "Command should start with 'deadline'";
         String[] parts = fullCommand.substring(9).split("/by", 2);
         if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
             throw new EinsteinException("Invalid deadline format! Use: deadline <description> /by <date>");
         }
         this.description = parts[0].trim();
         this.by = parseDateTime(parts[1].trim());
+        assert this.description != null && !this.description.isEmpty() : "Description should not be null or empty";
     }
 
     /**
@@ -43,6 +46,7 @@ public class AddDeadlineCommand implements Command {
      * @throws EinsteinException If the date/time format is invalid.
      */
     private LocalDateTime parseDateTime(String dateTimeStr) throws EinsteinException {
+        assert dateTimeStr != null && !dateTimeStr.isEmpty() : "Date/time string should not be null or empty";
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
             return LocalDateTime.parse(dateTimeStr, formatter);
@@ -62,10 +66,17 @@ public class AddDeadlineCommand implements Command {
      */
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        assert tasks != null : "TaskList cannot be null";
+        assert ui != null : "Ui cannot be null";
+        assert storage != null : "Storage cannot be null";
         Task task = new Deadline(description, by);
+        int originalTaskCount = tasks.getTaskCount();
         tasks.addTask(task);
+        assert tasks.getTaskCount() == originalTaskCount + 1 : "Task count should increase by 1";
         storage.save(tasks.getTasks());
-        return ui.showTaskAdded(task, tasks.getTaskCount());
+        String result = ui.showTaskAdded(task, tasks.getTaskCount());
+        assert result != null && !result.isEmpty() : "Result string should not be null or empty";
+        return result;
     }
 
     /**

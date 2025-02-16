@@ -19,7 +19,13 @@ public class AddMultipleTodosCommand implements Command {
      * @param descriptions An array of task descriptions.
      */
     public AddMultipleTodosCommand(String... descriptions) {
+        assert descriptions != null : "Descriptions array cannot be null";
+        assert descriptions.length > 0 : "At least one description must be provided";
         this.descriptions = descriptions;
+        for (String description : descriptions) {
+            assert description != null : "Individual description cannot be null";
+            assert !description.trim().isEmpty() : "Description cannot be empty after trimming";
+        }
     }
 
     /**
@@ -33,14 +39,30 @@ public class AddMultipleTodosCommand implements Command {
      */
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        assert tasks != null : "TaskList cannot be null";
+        assert ui != null : "Ui cannot be null";
+        assert storage != null : "Storage cannot be null";
         StringBuilder result = new StringBuilder();
+        int initialTaskCount = tasks.getTaskCount();
         for (String description : descriptions) {
             Task task = new Todo(description.trim());
+            assert task != null : "Created task should not be null";
+            int beforeAddCount = tasks.getTaskCount();
             tasks.addTask(task);
-            result.append(ui.showTaskAdded(task, tasks.getTaskCount())).append("\n");
+            assert tasks.getTaskCount() == beforeAddCount + 1 : "Task count should increase by 1 for each added task";
+            String addedMessage = ui.showTaskAdded(task, tasks.getTaskCount());
+            assert addedMessage != null && !addedMessage.isEmpty() : "Task added message should not be null or empty";
+            result.append(addedMessage).append("\n");
         }
         storage.save(tasks.getTasks());
-        return result.append("\n").toString();
+
+        assert tasks.getTaskCount() == initialTaskCount + descriptions.length
+                : "Final task count should match initial count plus number of added tasks";
+
+        String finalResult = result.append("\n").toString();
+        assert !finalResult.isEmpty() : "Final result string should not be empty";
+
+        return finalResult;
     }
 
     @Override
