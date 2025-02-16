@@ -1,21 +1,58 @@
 package einstein.task;
 
 /**
- * Represents a generic task. A <code>Task</code> object corresponds to a task with a description
- * and a status indicating whether the task is done or not.
+ * Represents a generic task in the Einstein task management system.
+ * A Task object corresponds to a task with a description and a status
+ * indicating whether the task is done or not.
  */
 public class Task {
-    public String description;
-    public boolean isDone;
+    private String description;
+    private boolean isDone;
 
     /**
-     * Constructs a <code>Task</code> object with a description. The task is initially marked as not done.
+     * Constructs a Task object with a description. The task is initially marked as not done.
      *
      * @param description The description of the task.
      */
     public Task(String description) {
         this.description = description;
         this.isDone = false;
+    }
+
+    /**
+     * Gets the description of the task.
+     *
+     * @return The description of the task.
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Sets the description of the task.
+     *
+     * @param description The new description of the task.
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Checks if the task is done.
+     *
+     * @return true if the task is done, false otherwise.
+     */
+    public boolean getIsDone() {
+        return isDone;
+    }
+
+    /**
+     * Sets the done status of the task.
+     *
+     * @param done The new done status of the task.
+     */
+    public void setDone(boolean done) {
+        isDone = done;
     }
 
     /**

@@ -2,13 +2,13 @@ package einstein.gui;
 
 import java.io.IOException;
 
+import einstein.Einstein;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-import einstein.Einstein;
 
 /**
  * A GUI for Duke using FXML.
@@ -24,7 +24,7 @@ public class Main extends Application {
             AnchorPane ap = fxmlLoader.load();
             Scene scene = new Scene(ap);
             stage.setScene(scene);
-            fxmlLoader.<MainWindow>getController().setEinstein(einstein);  // inject the Einstein instance
+            fxmlLoader.<MainWindow>getController().setEinstein(einstein);
             stage.show();
 
             stage.setMinHeight(220);
@@ -37,6 +37,3 @@ public class Main extends Application {
         }
     }
 }
-
-
-

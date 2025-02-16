@@ -1,19 +1,19 @@
 package einstein.parser;
 
-import einstein.command.FindCommand;
-import einstein.exception.EinsteinException;
-import einstein.command.Command;
-import einstein.command.ExitCommand;
-import einstein.command.ListCommand;
-import einstein.command.ListByDateCommand;
-import einstein.command.MarkCommand;
-import einstein.command.UnmarkCommand;
-import einstein.command.AddTodoCommand;
 import einstein.command.AddDeadlineCommand;
 import einstein.command.AddEventCommand;
+import einstein.command.AddTodoCommand;
+import einstein.command.Command;
 import einstein.command.DeleteCommand;
-import einstein.command.HelpCommand;
+import einstein.command.ExitCommand;
 import einstein.command.FindCommand;
+import einstein.command.HelpCommand;
+import einstein.command.ListByDateCommand;
+import einstein.command.ListCommand;
+import einstein.command.MarkCommand;
+import einstein.command.UnmarkCommand;
+import einstein.exception.EinsteinException;
+
 
 /**
  * Parses user input and returns the corresponding command object.
@@ -55,7 +55,8 @@ public class Parser {
         } else if (fullCommand.startsWith("find ")) {
             return new FindCommand(fullCommand);
         } else {
-            throw new EinsteinException("ARGH! I do not understand you, which is weird, \nbecause I usually understand most things. Invalid command!");
+            throw new EinsteinException("ARGH! I do not understand you, which is weird, "
+                    + "\nbecause I usually understand most things. Invalid command!");
         }
     }
 }

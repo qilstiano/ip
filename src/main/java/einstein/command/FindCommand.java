@@ -1,12 +1,12 @@
 package einstein.command;
 
-import einstein.exception.EinsteinException;
-import einstein.storage.TaskList;
-import einstein.storage.Storage;
-import einstein.ui.Ui;
-import einstein.task.Task;
-
 import java.util.ArrayList;
+
+import einstein.exception.EinsteinException;
+import einstein.storage.Storage;
+import einstein.storage.TaskList;
+import einstein.task.Task;
+import einstein.ui.Ui;
 
 /**
  * Represents a command to search for tasks containing a specific keyword.
@@ -39,7 +39,7 @@ public class FindCommand implements Command {
     public String execute(TaskList tasks, Ui ui, Storage storage) {
         ArrayList<Task> matchingTasks = new ArrayList<>();
         for (Task task : tasks.getTasks()) {
-            if (task.description.contains(keyword)) {
+            if (task.getDescription().contains(keyword)) {
                 matchingTasks.add(task);
             }
         }
