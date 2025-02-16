@@ -1,31 +1,43 @@
 package einstein.storage;
 
-import java.util.List;
-import java.util.ArrayList;
-
-// Imports for Date and Time
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 
-// Imports for file reading and writing
-import java.nio.file.Paths;
-import java.nio.file.Files;
-import java.io.IOException;
-
-import einstein.task.Todo;
-import einstein.task.Task;
-import einstein.task.Event;
-import einstein.task.Deadline;
 import einstein.exception.EinsteinException;
+import einstein.task.Deadline;
+import einstein.task.Event;
+import einstein.task.Task;
+import einstein.task.Todo;
 
+/**
+ * Manages the storage of tasks in the Einstein task management system.
+ * This class handles loading tasks from and saving tasks to a file.
+ */
 public class Storage {
     private String filePath;
 
+    /**
+     * Constructs a new Storage object with the specified file path.
+     *
+     * @param filePath The path to the file used for storing tasks.
+     */
     public Storage(String filePath) {
         this.filePath = filePath;
     }
 
+    /**
+     * Loads tasks from the file specified in the constructor.
+     *
+     * @return An ArrayList of Task objects loaded from the file.
+     * @throws EinsteinException If there's an error reading from the file, parsing the data,
+     *                           or if corrupted data is found.
+     */
     public ArrayList<Task> load() throws EinsteinException {
         ArrayList<Task> tasks = new ArrayList<>();
         try {
@@ -81,6 +93,12 @@ public class Storage {
         return tasks;
     }
 
+    /**
+     * Saves the given list of tasks to the file specified in the constructor.
+     *
+     * @param tasks The ArrayList of Task objects to be saved.
+     * @throws EinsteinException If there's an error writing to the file.
+     */
     public void save(ArrayList<Task> tasks) throws EinsteinException {
         try {
             Files.createDirectories(Paths.get("data"));
@@ -89,15 +107,19 @@ public class Storage {
 
             for (Task task : tasks) {
                 if (task instanceof Todo) {
-                    data.append("T | ").append(task.isDone ? "1" : "0").append(" | ").append(task.description).append("\n");
+                    data.append("T | ").append(task.getIsDone() ? "1" : "0").append(" | ").append(task.getDescription())
+                            .append("\n");
                 } else if (task instanceof Deadline) {
                     Deadline deadline = (Deadline) task;
-                    data.append("D | ").append(deadline.isDone ? "1" : "0").append(" | ").append(deadline.description)
-                            .append(" | ").append(deadline.by.format(formatter)).append("\n");
+                    data.append("D | ").append(deadline.getIsDone() ? "1" : "0")
+                            .append(" | ").append(deadline.getDescription())
+                            .append(" | ").append(deadline.getBy().format(formatter)).append("\n");
                 } else if (task instanceof Event) {
                     Event event = (Event) task;
-                    data.append("E | ").append(event.isDone ? "1" : "0").append(" | ").append(event.description)
-                            .append(" | ").append(event.from.format(formatter)).append(" | ").append(event.to.format(formatter)).append("\n");
+                    data.append("E | ").append(event.getIsDone() ? "1" : "0")
+                            .append(" | ").append(event.getDescription())
+                            .append(" | ").append(event.getFrom().format(formatter)).append(" | ")
+                            .append(event.getTo().format(formatter)).append("\n");
                 }
             }
             Files.write(Paths.get(filePath), data.toString().getBytes());

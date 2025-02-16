@@ -1,16 +1,25 @@
 package einstein;
+
+import einstein.command.Command;
 import einstein.exception.EinsteinException;
+import einstein.parser.Parser;
 import einstein.storage.Storage;
 import einstein.storage.TaskList;
-import einstein.command.Command;
-import einstein.parser.Parser;
 import einstein.ui.Ui;
 
+/**
+ * The main class for the Einstein task management application.
+ */
 public class Einstein {
     private Storage storage;
     private TaskList tasks;
     private Ui ui;
 
+    /**
+     * Constructs a new Einstein instance.
+     *
+     * @param filePath The file path for storing tasks.
+     */
     public Einstein(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
@@ -22,6 +31,10 @@ public class Einstein {
         }
     }
 
+    /**
+     * Runs the main loop of the Einstein chatbot.
+     * Continuously reads user input, executes commands, and displays results until exit.
+     */
     public void run() {
         ui.showWelcome();
         boolean isExit = false;
