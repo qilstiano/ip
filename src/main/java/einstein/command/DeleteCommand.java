@@ -38,7 +38,7 @@ public class DeleteCommand implements Command {
     public String execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
         tasks.deleteTask(taskIndex);
         storage.save(tasks.getTasks());
-        return ui.showTaskList(tasks.getTasks());
+        return "Got it. Deleted!\n" + ui.showTaskList(tasks.getTasks());
     }
 
     /**

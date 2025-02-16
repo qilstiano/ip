@@ -35,7 +35,7 @@ public class Ui {
                 "                                                     ";
         return "____________________________________________________________\n"
                 + chatbotAscii + "\n"
-                + "\nEinstein\nGuten tag, Einstein here! What can I do for you?" + "\n"
+                + "Guten tag, Einstein here! What can I do for you?" + "\n"
                 + "____________________________________________________________";
     }
 
@@ -44,7 +44,7 @@ public class Ui {
      */
     public String showFarewell() {
         return "____________________________________________________________\n"
-                + "Einstein\n\tBye, hope to see you again soon!" + "\n"
+                + "Bye, hope to see you again soon!" + "\n"
                 + "____________________________________________________________";
     }
 
@@ -61,7 +61,7 @@ public class Ui {
      * @param message The error message to be displayed.
      */
     public String showError(String message) {
-        return "Einstein\n" + message;
+        return message;
     }
 
     /**
@@ -81,7 +81,7 @@ public class Ui {
      * @param taskCount The total number of tasks in the list after adding the task.
      */
     public String showTaskAdded(Task task, int taskCount) {
-        return "Einstein\nGot it. I've added this task:" + "\n"
+        return "Got it. I've added this task:" + "\n"
                 + "  " + task + "\n"
                 + "Now you have " + taskCount + " tasks in the list.";
     }
@@ -92,7 +92,7 @@ public class Ui {
      * @param tasks The list of tasks to be displayed.
      */
     public String showTaskList(ArrayList<Task> tasks) {
-        StringBuilder output = new StringBuilder("Einstein\nHere are the tasks in your list:\n");
+        StringBuilder output = new StringBuilder("Here are the tasks in your list:\n\n");
         if (tasks.isEmpty()) {
             output.append("Hmmm, didn't find any tasks. Add some tasks!");
         } else {
@@ -110,7 +110,7 @@ public class Ui {
      * @param date The date to filter the tasks by.
      */
     public String showTasksByDate(ArrayList<Task> tasks, LocalDate date) {
-        StringBuilder output = new StringBuilder("Einstein\nHere are the tasks occurring on "
+        StringBuilder output = new StringBuilder("Here are the tasks occurring on "
                 + date.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":\n");
         boolean found = false;
         for (int i = 0; i < tasks.size(); i++) {
