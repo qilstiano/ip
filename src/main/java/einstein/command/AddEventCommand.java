@@ -27,13 +27,32 @@ public class AddEventCommand implements Command {
      * @param fullCommand The full command string from the user input.
      * @throws EinsteinException If the command format is invalid or the date/time is improperly formatted.
      */
-    public AddEventCommand(String fullCommand) throws EinsteinException {
+     public AddEventCommand(String fullCommand) throws EinsteinException {
         assert fullCommand != null : "Full command cannot be null";
         assert fullCommand.startsWith("event") : "Command should start with 'event'";
-        String[] parts = fullCommand.substring(6).split("/from|/to", 3);
-        if (parts.length < 3 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty() || parts[2].trim().isEmpty()) {
+        String[] parts = parseCommand(fullCommand);
+        validateParts(parts);
+        initializeFields(parts);
+    }
+
+    private String[] parseCommand(String fullCommand) {
+        return fullCommand.substring(6).split("/from|/to", 3);
+    }
+
+    private void validateParts(String[] parts) throws EinsteinException {
+        if (isInvalidFormat(parts)) {
             throw new EinsteinException("Invalid event format! Use: event <description> /from <start> /to <end>");
         }
+    }
+  
+    private boolean isInvalidFormat(String[] parts) {
+        return parts.length < 3 ||
+                parts[0].trim().isEmpty() ||
+                parts[1].trim().isEmpty() ||
+                parts[2].trim().isEmpty();
+    }
+  
+    private void initializeFields(String[] parts) throws EinsteinException {
         this.description = parts[0].trim();
         this.from = parseDateTime(parts[1].trim());
         this.to = parseDateTime(parts[2].trim());

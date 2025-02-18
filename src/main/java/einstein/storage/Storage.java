@@ -41,61 +41,93 @@ public class Storage {
      */
     public ArrayList<Task> load() throws EinsteinException {
         ArrayList<Task> tasks = new ArrayList<>();
+        if (!fileExists()) {
+            return tasks;
+        }
+
         try {
-            if (!Files.exists(Paths.get(filePath))) {
-                return tasks;
-            }
-
-            List<String> lines = Files.readAllLines(Paths.get(filePath));
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
-
+            List<String> lines = readLinesFromFile();
             for (String line : lines) {
                 assert line != null && !line.isEmpty() : "Line cannot be null or empty";
-
-                String[] parts = line.split(" \\| ");
-                assert parts.length >= 3 : "Each line should have at least 3 parts";
-                if (parts.length < 3) {
-                    throw new EinsteinException("Corrupted data found in file. Skipping line: " + line);
-                }
-
-                String type = parts[0].trim();
-                boolean isDone = parts[1].trim().equals("1");
-                String description = parts[2].trim();
-
-                Task task;
-                switch (type) {
-                case "T":
-                    task = new Todo(description);
-                    break;
-                case "D":
-                    if (parts.length < 4) {
-                        throw new EinsteinException("Corrupted deadline data found. Skipping line: " + line);
-                    }
-                    LocalDateTime by = LocalDateTime.parse(parts[3].trim(), formatter);
-                    task = new Deadline(description, by);
-                    break;
-                case "E":
-                    if (parts.length < 5) {
-                        throw new EinsteinException("Corrupted event data found. Skipping line: " + line);
-                    }
-                    LocalDateTime from = LocalDateTime.parse(parts[3].trim(), formatter);
-                    LocalDateTime to = LocalDateTime.parse(parts[4].trim(), formatter);
-                    task = new Event(description, from, to);
-                    break;
-                default:
-                    throw new EinsteinException("Unknown task type found. Skipping line: " + line);
-                }
-
-                if (isDone) {
-                    task.markAsDone();
-                }
+                Task task = parseTask(line);
                 tasks.add(task);
             }
-        } catch (IOException | DateTimeParseException e) {
+        } catch (IOException e) {
             throw new EinsteinException("Error loading tasks from file: " + e.getMessage());
         }
         assert tasks != null : "Loaded tasks list should not be null";
         return tasks;
+    }
+
+    private boolean fileExists() {
+        return Files.exists(Paths.get(filePath));
+    }
+
+    private List<String> readLinesFromFile() throws IOException {
+        return Files.readAllLines(Paths.get(filePath));
+    }
+
+    private Task parseTask(String line) throws EinsteinException {
+        String[] parts = line.split(" \\| ");
+        validateParts(parts, line);
+        String type = parts[0].trim();
+        boolean isDone = parts[1].trim().equals("1");
+        String description = parts[2].trim();
+        Task task = createTask(type, description, parts);
+        if (isDone) {
+            task.markAsDone();
+        }
+        return task;
+    }
+
+    private void validateParts(String[] parts, String line) throws EinsteinException {
+        if (parts.length < 3) {
+            throw new EinsteinException("Corrupted data found in file. Skipping line: " + line);
+        }
+    }
+
+    private Task createTask(String type, String description, String[] parts) throws EinsteinException {
+        return switch (type) {
+            case "T" -> new Todo(description);
+            case "D" -> createDeadline(description, parts);
+            case "E" -> createEvent(description, parts);
+            default ->
+                    throw new EinsteinException("Unknown task type found. Skipping line: " + String.join(" | ", parts));
+        };
+    }
+
+    private Task createDeadline(String description, String[] parts) throws EinsteinException {
+        validateDeadlineParts(parts);
+        LocalDateTime by = parseDateTime(parts[3].trim());
+        return new Deadline(description, by);
+    }
+
+    private Task createEvent(String description, String[] parts) throws EinsteinException {
+        validateEventParts(parts);
+        LocalDateTime from = parseDateTime(parts[3].trim());
+        LocalDateTime to = parseDateTime(parts[4].trim());
+        return new Event(description, from, to);
+    }
+
+    private void validateDeadlineParts(String[] parts) throws EinsteinException {
+        if (parts.length < 4) {
+            throw new EinsteinException("Corrupted deadline data found. Skipping line: " + String.join(" | ", parts));
+        }
+    }
+
+    private void validateEventParts(String[] parts) throws EinsteinException {
+        if (parts.length < 5) {
+            throw new EinsteinException("Corrupted event data found. Skipping line: " + String.join(" | ", parts));
+        }
+    }
+
+    private LocalDateTime parseDateTime(String dateTimeString) throws EinsteinException {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
+            return LocalDateTime.parse(dateTimeString, formatter);
+        } catch (DateTimeParseException e) {
+            throw new EinsteinException("Invalid date/time format: " + dateTimeString);
+        }
     }
 
     /**
@@ -107,31 +139,64 @@ public class Storage {
     public void save(ArrayList<Task> tasks) throws EinsteinException {
         assert tasks != null : "Tasks list cannot be null";
         try {
-            Files.createDirectories(Paths.get("data"));
-            StringBuilder data = new StringBuilder();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
-
-            for (Task task : tasks) {
-                assert task != null : "Task in the list cannot be null";
-                if (task instanceof Todo) {
-                    data.append("T | ").append(task.getIsDone() ? "1" : "0").append(" | ").append(task.getDescription())
-                            .append("\n");
-                } else if (task instanceof Deadline) {
-                    Deadline deadline = (Deadline) task;
-                    data.append("D | ").append(deadline.getIsDone() ? "1" : "0")
-                            .append(" | ").append(deadline.getDescription())
-                            .append(" | ").append(deadline.getBy().format(formatter)).append("\n");
-                } else if (task instanceof Event) {
-                    Event event = (Event) task;
-                    data.append("E | ").append(event.getIsDone() ? "1" : "0")
-                            .append(" | ").append(event.getDescription())
-                            .append(" | ").append(event.getFrom().format(formatter)).append(" | ")
-                            .append(event.getTo().format(formatter)).append("\n");
-                }
-            }
-            Files.write(Paths.get(filePath), data.toString().getBytes());
+            createDataDirectory();
+            String data = buildTaskData(tasks);
+            writeDataToFile(data);
         } catch (IOException e) {
             throw new EinsteinException("Error saving tasks to file: " + e.getMessage());
         }
+    }
+
+    private void createDataDirectory() throws IOException {
+        Files.createDirectories(Paths.get("data"));
+    }
+
+    private String buildTaskData(ArrayList<Task> tasks) {
+        StringBuilder data = new StringBuilder();
+        for (Task task : tasks) {
+            assert task != null : "Task in the list cannot be null";
+            data.append(formatTask(task));
+        }
+        return data.toString();
+    }
+
+    private String formatTask(Task task) {
+        if (task instanceof Todo) {
+            return formatTodo((Todo) task);
+        } else if (task instanceof Deadline) {
+            return formatDeadline((Deadline) task);
+        } else if (task instanceof Event) {
+            return formatEvent((Event) task);
+        } else {
+            return ""; // Handle unknown task types
+        }
+    }
+
+    private String formatTodo(Todo todo) {
+        return String.format("T | %s | %s\n", todo.getIsDone() ? "1" : "0", todo.getDescription());
+    }
+
+    private String formatDeadline(Deadline deadline) {
+        return String.format("D | %s | %s | %s\n",
+                deadline.getIsDone() ? "1" : "0",
+                deadline.getDescription(),
+                formatDateTime(deadline.getBy()));
+    }
+
+    private String formatEvent(Event event) {
+        return String.format("E | %s | %s | %s | %s\n",
+                event.getIsDone() ? "1" : "0",
+                event.getDescription(),
+                formatDateTime(event.getFrom()),
+                formatDateTime(event.getTo()));
+    }
+
+    private String formatDateTime(LocalDateTime dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
+        return dateTime.format(formatter);
+    }
+
+    private void writeDataToFile(String data) throws IOException {
+        Files.write(Paths.get(filePath), data.getBytes());
     }
 }
