@@ -18,8 +18,11 @@ public class DeleteCommand implements Command {
      * @throws EinsteinException If the task number in the command is invalid.
      */
     public DeleteCommand(String fullCommand) throws EinsteinException {
+        assert fullCommand != null : "Full command cannot be null";
+        assert fullCommand.startsWith("delete") : "Command should start with 'delete'";
         try {
             this.taskIndex = Integer.parseInt(fullCommand.substring(7).trim()) - 1;
+            assert this.taskIndex >= 0 : "Task index must be non-negative";
         } catch (NumberFormatException e) {
             throw new EinsteinException("Invalid task number! Please give me something valid!");
         }
@@ -36,9 +39,17 @@ public class DeleteCommand implements Command {
      */
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        assert tasks != null : "TaskList cannot be null";
+        assert ui != null : "Ui cannot be null";
+        assert storage != null : "Storage cannot be null";
+        assert taskIndex < tasks.getTaskCount() : "Task index out of bounds";
+        int originalTaskCount = tasks.getTaskCount();
         tasks.deleteTask(taskIndex);
+        assert tasks.getTaskCount() == originalTaskCount - 1 : "Task count should decrease by 1";
         storage.save(tasks.getTasks());
-        return "Got it. Deleted!\n" + ui.showTaskList(tasks.getTasks());
+        String result = "Got it. Deleted!\n" + ui.showTaskList(tasks.getTasks());
+        assert result != null && !result.isEmpty() : "Result string should not be null or empty";
+        return result;
     }
 
     /**

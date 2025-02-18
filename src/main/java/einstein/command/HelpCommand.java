@@ -18,8 +18,13 @@ public class HelpCommand implements Command {
      * @return A string containing the help information for all available commands.
      * @throws EinsteinException If there's an error in generating or displaying the help information.
      */
+    @SuppressWarnings("checkstyle:Regexp")
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        assert tasks != null : "TaskList cannot be null";
+        assert ui != null : "UI cannot be null";
+        assert storage != null : "Storage cannot be null";
+        // Default help prompt listed below
         StringBuilder output = new StringBuilder();
         output.append(ui.showLine()).append("\n");
         output.append("Here are the commands I understand:\n");

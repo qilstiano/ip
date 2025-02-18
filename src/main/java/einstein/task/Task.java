@@ -15,6 +15,7 @@ public class Task {
      * @param description The description of the task.
      */
     public Task(String description) {
+        assert description != null && !description.trim().isEmpty() : "Description cannot be null or empty";
         this.description = description;
         this.isDone = false;
     }
@@ -25,6 +26,7 @@ public class Task {
      * @return The description of the task.
      */
     public String getDescription() {
+        assert description != null : "Description should not be null";
         return description;
     }
 
@@ -34,6 +36,7 @@ public class Task {
      * @param description The new description of the task.
      */
     public void setDescription(String description) {
+        assert description != null && !description.trim().isEmpty() : "New description cannot be null or empty";
         this.description = description;
     }
 
@@ -61,7 +64,7 @@ public class Task {
      * @return A string representing the task's status icon.
      */
     public String getStatusIcon() {
-        return (isDone ? "X" : " "); // mark done task with X
+        return (isDone ? "X" : " ");
     }
 
     /**
