@@ -1,13 +1,17 @@
 package einstein.task;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Represents a generic task in the Einstein task management system.
- * A Task object corresponds to a task with a description and a status
- * indicating whether the task is done or not.
+ * A Task object corresponds to a task with a description, a status
+ * indicating whether the task is done or not, and a set of tags.
  */
 public class Task {
     private String description;
     private boolean isDone;
+    private Set<String> tags;
 
     /**
      * Constructs a Task object with a description. The task is initially marked as not done.
@@ -18,6 +22,7 @@ public class Task {
         assert description != null && !description.trim().isEmpty() : "Description cannot be null or empty";
         this.description = description;
         this.isDone = false;
+        this.tags = new HashSet<>();
     }
 
     /**
@@ -82,13 +87,46 @@ public class Task {
     }
 
     /**
-     * Returns a string representation of the task, formatted as "[status_icon] description".
+     * Adds a tag to the task.
+     *
+     * @param tag The tag to add.
+     */
+    public void addTag(String tag) {
+        assert tag != null && !tag.trim().isEmpty() : "Tag cannot be null or empty";
+        tags.add(tag);
+    }
+
+    /**
+     * Removes a tag from the task.
+     *
+     * @param tag The tag to remove.
+     */
+    public void removeTag(String tag) {
+        assert tag != null && !tag.trim().isEmpty() : "Tag cannot be null or empty";
+        tags.remove(tag);
+    }
+
+    /**
+     * Gets the tags associated with the task.
+     *
+     * @return A set of tags.
+     */
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    /**
+     * Returns a string representation of the task, formatted as "[status_icon] description #tags".
      * The status icon represents whether the task is done or not.
      *
      * @return A string representation of the task.
      */
     @Override
     public String toString() {
-        return "[" + getStatusIcon() + "] " + description;
+        StringBuilder tagsString = new StringBuilder();
+        for (String tag : tags) {
+            tagsString.append(" #").append(tag);
+        }
+        return "[" + getStatusIcon() + "] " + description + tagsString.toString();
     }
 }
