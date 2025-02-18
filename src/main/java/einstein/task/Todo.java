@@ -13,6 +13,7 @@ public class Todo extends Task {
      */
     public Todo(String description) {
         super(description);
+        assert !description.trim().isEmpty() : "Todo description cannot be null or empty";
     }
 
     /**
@@ -22,7 +23,9 @@ public class Todo extends Task {
      */
     @Override
     public String getDescription() {
-        return super.getDescription();
+        String description = super.getDescription();
+        assert description != null && !description.isEmpty() : "Todo description should not be null or empty";
+        return description;
     }
 
     /**
@@ -32,6 +35,7 @@ public class Todo extends Task {
      */
     @Override
     public void setDescription(String description) {
+        assert description != null && !description.trim().isEmpty() : "New todo description cannot be null or empty";
         super.setDescription(description);
     }
 
@@ -43,6 +47,7 @@ public class Todo extends Task {
     @Override
     public void setDone(boolean done) {
         super.setDone(done);
+        assert getIsDone() == done : "Todo done status should be correctly set";
     }
 
     /**
@@ -53,6 +58,9 @@ public class Todo extends Task {
      */
     @Override
     public String toString() {
-        return "[T]" + super.toString();
+        String result = "[T]" + super.toString();
+        assert result.startsWith("[T]") : "Todo string representation should start with [T]";
+        assert result.length() > 3 : "Todo string representation should include more than just the [T] prefix";
+        return result;
     }
 }

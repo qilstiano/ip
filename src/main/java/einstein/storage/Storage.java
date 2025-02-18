@@ -28,6 +28,7 @@ public class Storage {
      * @param filePath The path to the file used for storing tasks.
      */
     public Storage(String filePath) {
+        assert filePath != null && !filePath.isEmpty() : "File path cannot be null or empty";
         this.filePath = filePath;
     }
 
@@ -49,7 +50,10 @@ public class Storage {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
 
             for (String line : lines) {
+                assert line != null && !line.isEmpty() : "Line cannot be null or empty";
+
                 String[] parts = line.split(" \\| ");
+                assert parts.length >= 3 : "Each line should have at least 3 parts";
                 if (parts.length < 3) {
                     throw new EinsteinException("Corrupted data found in file. Skipping line: " + line);
                 }
@@ -90,6 +94,7 @@ public class Storage {
         } catch (IOException | DateTimeParseException e) {
             throw new EinsteinException("Error loading tasks from file: " + e.getMessage());
         }
+        assert tasks != null : "Loaded tasks list should not be null";
         return tasks;
     }
 
@@ -100,12 +105,14 @@ public class Storage {
      * @throws EinsteinException If there's an error writing to the file.
      */
     public void save(ArrayList<Task> tasks) throws EinsteinException {
+        assert tasks != null : "Tasks list cannot be null";
         try {
             Files.createDirectories(Paths.get("data"));
             StringBuilder data = new StringBuilder();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
 
             for (Task task : tasks) {
+                assert task != null : "Task in the list cannot be null";
                 if (task instanceof Todo) {
                     data.append("T | ").append(task.getIsDone() ? "1" : "0").append(" | ").append(task.getDescription())
                             .append("\n");
