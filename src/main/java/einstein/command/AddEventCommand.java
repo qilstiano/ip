@@ -27,29 +27,39 @@ public class AddEventCommand implements Command {
      * @param fullCommand The full command string from the user input.
      * @throws EinsteinException If the command format is invalid or the date/time is improperly formatted.
      */
-    public AddEventCommand(String fullCommand) throws EinsteinException {
+     public AddEventCommand(String fullCommand) throws EinsteinException {
+        assert fullCommand != null : "Full command cannot be null";
+        assert fullCommand.startsWith("event") : "Command should start with 'event'";
         String[] parts = parseCommand(fullCommand);
         validateParts(parts);
         initializeFields(parts);
     }
+
     private String[] parseCommand(String fullCommand) {
         return fullCommand.substring(6).split("/from|/to", 3);
     }
+
     private void validateParts(String[] parts) throws EinsteinException {
         if (isInvalidFormat(parts)) {
             throw new EinsteinException("Invalid event format! Use: event <description> /from <start> /to <end>");
         }
     }
+  
     private boolean isInvalidFormat(String[] parts) {
         return parts.length < 3 ||
                 parts[0].trim().isEmpty() ||
                 parts[1].trim().isEmpty() ||
                 parts[2].trim().isEmpty();
     }
+  
     private void initializeFields(String[] parts) throws EinsteinException {
         this.description = parts[0].trim();
         this.from = parseDateTime(parts[1].trim());
         this.to = parseDateTime(parts[2].trim());
+        assert this.description != null && !this.description.isEmpty() : "Description should not be null or empty";
+        assert this.from != null : "Start time should not be null";
+        assert this.to != null : "End time should not be null";
+        assert !this.to.isBefore(this.from) : "End time should not be before start time";
     }
 
     /**
@@ -62,7 +72,9 @@ public class AddEventCommand implements Command {
     private LocalDateTime parseDateTime(String dateTimeStr) throws EinsteinException {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy HHmm");
-            return LocalDateTime.parse(dateTimeStr, formatter);
+            LocalDateTime parsedDateTime = LocalDateTime.parse(dateTimeStr, formatter);
+            assert parsedDateTime != null : "Parsed date/time should not be null";
+            return parsedDateTime;
         } catch (DateTimeParseException e) {
             throw new EinsteinException("Invalid date/time format! Use: dd/MM/yyyy HHmm (e.g., 2/12/2019 1800)");
         }
@@ -79,10 +91,18 @@ public class AddEventCommand implements Command {
      */
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        assert tasks != null : "TaskList cannot be null";
+        assert ui != null : "Ui cannot be null";
+        assert storage != null : "Storage cannot be null";
         Task task = new Event(description, from, to);
+        assert task != null : "Created task should not be null";
+        int originalTaskCount = tasks.getTaskCount();
         tasks.addTask(task);
+        assert tasks.getTaskCount() == originalTaskCount + 1 : "Task count should increase by 1";
         storage.save(tasks.getTasks());
-        return ui.showTaskAdded(task, tasks.getTaskCount());
+        String result = ui.showTaskAdded(task, tasks.getTaskCount());
+        assert result != null && !result.isEmpty() : "Result string should not be null or empty";
+        return result;
     }
 
     /**

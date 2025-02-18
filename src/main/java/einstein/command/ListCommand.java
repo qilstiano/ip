@@ -21,7 +21,15 @@ public class ListCommand implements Command {
      */
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
-        return ui.showTaskList(tasks.getTasks());
+        assert tasks != null : "TaskList cannot be null";
+        assert ui != null : "UI cannot be null";
+        assert storage != null : "Storage cannot be null";
+
+        String result = ui.showTaskList(tasks.getTasks());
+        assert result != null : "Result string should not be null";
+        assert !result.isEmpty() : "Result string should not be empty";
+
+        return result;
     }
 
     /**

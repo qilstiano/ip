@@ -18,8 +18,11 @@ public class MarkCommand implements Command {
      * @throws EinsteinException If the task number in the command is invalid.
      */
     public MarkCommand(String fullCommand) throws EinsteinException {
+        assert fullCommand != null : "Full command cannot be null";
+        assert fullCommand.startsWith("mark") : "Command should start with 'mark'";
         try {
             this.taskIndex = Integer.parseInt(fullCommand.substring(5).trim()) - 1;
+            assert this.taskIndex >= 0 : "Task index must be non-negative";
         } catch (NumberFormatException e) {
             throw new EinsteinException("Invalid task number! Please give me something valid!");
         }
@@ -36,9 +39,16 @@ public class MarkCommand implements Command {
      */
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        assert tasks != null : "TaskList cannot be null";
+        assert ui != null : "UI cannot be null";
+        assert storage != null : "Storage cannot be null";
+        assert taskIndex < tasks.getTaskCount() : "Task index out of bounds";
         tasks.markTaskAsDone(taskIndex);
         storage.save(tasks.getTasks());
-        return ui.showTaskList(tasks.getTasks());
+        String result = ui.showTaskList(tasks.getTasks());
+        assert result != null : "Result string should not be null";
+        assert !result.isEmpty() : "Result string should not be empty";
+        return result;
     }
 
     /**

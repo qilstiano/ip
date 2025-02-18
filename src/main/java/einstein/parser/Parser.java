@@ -32,32 +32,39 @@ public class Parser {
      * @throws EinsteinException If the input command is invalid or not recognized.
      */
     public static Command parse(String fullCommand) throws EinsteinException {
+        assert fullCommand != null : "Full command cannot be null";
+        assert !fullCommand.trim().isEmpty() : "Full command cannot be empty";
+        Command command;
+
         if (fullCommand.equalsIgnoreCase("bye")) {
-            return new ExitCommand();
+            command = new ExitCommand();
         } else if (fullCommand.equalsIgnoreCase("list")) {
-            return new ListCommand();
+            command = new ListCommand();
         } else if (fullCommand.startsWith("list ")) {
-            return new ListByDateCommand(fullCommand);
+            command = new ListByDateCommand(fullCommand);
         } else if (fullCommand.startsWith("mark ")) {
-            return new MarkCommand(fullCommand);
+            command = new MarkCommand(fullCommand);
         } else if (fullCommand.startsWith("unmark ")) {
-            return new UnmarkCommand(fullCommand);
+            command = new UnmarkCommand(fullCommand);
         } else if (fullCommand.startsWith("todo ")) {
-            return parseTodoCommand(fullCommand);
+            command = parseTodoCommand(fullCommand);
         } else if (fullCommand.startsWith("deadline ")) {
-            return new AddDeadlineCommand(fullCommand);
+            command = new AddDeadlineCommand(fullCommand);
         } else if (fullCommand.startsWith("event ")) {
-            return new AddEventCommand(fullCommand);
+            command = new AddEventCommand(fullCommand);
         } else if (fullCommand.startsWith("delete ")) {
-            return new DeleteCommand(fullCommand);
+            command = new DeleteCommand(fullCommand);
         } else if (fullCommand.equalsIgnoreCase("help")) {
-            return new HelpCommand();
+            command = new HelpCommand();
         } else if (fullCommand.startsWith("find ")) {
-            return new FindCommand(fullCommand);
+            command = new FindCommand(fullCommand);
         } else {
             throw new EinsteinException("ARGH! I do not understand you, which is weird, "
                     + "\nbecause I usually understand most things. Invalid command!");
         }
+
+        assert command != null : "Parsed command should not be null";
+        return command;
     }
 
     /**
@@ -68,12 +75,19 @@ public class Parser {
      * @throws EinsteinException If the input command is invalid or not recognized.
      */
     private static Command parseTodoCommand(String fullCommand) throws EinsteinException {
+        assert fullCommand != null : "Full command cannot be null";
+        assert fullCommand.startsWith("todo ") : "Command should start with 'todo '";
+
         String args = fullCommand.substring(5).trim();
+        assert !args.isEmpty() : "Todo command should have arguments";
+
         // Handle multiple todos
         String[] todos = args.split(","); // Split by commas
         if (todos.length == 0) {
             throw new EinsteinException("Nein! You must provide at least one task description.");
         }
+
+        assert todos.length > 0 : "There should be at least one todo";
         return new AddMultipleTodosCommand(todos);
     }
 }

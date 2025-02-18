@@ -21,6 +21,10 @@ public class Event extends Task {
      */
     public Event(String description, LocalDateTime from, LocalDateTime to) {
         super(description);
+        assert description != null && !description.trim().isEmpty() : "Description cannot be null or empty";
+        assert from != null : "Start date/time cannot be null";
+        assert to != null : "End date/time cannot be null";
+        assert !to.isBefore(from) : "End date/time cannot be before start date/time";
         this.from = from;
         this.to = to;
     }
@@ -31,6 +35,7 @@ public class Event extends Task {
      * @return The LocalDateTime object representing the start of the event.
      */
     public LocalDateTime getFrom() {
+        assert from != null : "Start date/time should not be null";
         return from;
     }
 
@@ -40,6 +45,8 @@ public class Event extends Task {
      * @param from The new LocalDateTime object representing the start of the event.
      */
     public void setFrom(LocalDateTime from) {
+        assert from != null : "New start date/time cannot be null";
+        assert !to.isBefore(from) : "New start date/time cannot be after end date/time";
         this.from = from;
     }
 
@@ -49,6 +56,7 @@ public class Event extends Task {
      * @return The LocalDateTime object representing the end of the event.
      */
     public LocalDateTime getTo() {
+        assert to != null : "End date/time should not be null";
         return to;
     }
 
@@ -58,6 +66,8 @@ public class Event extends Task {
      * @param to The new LocalDateTime object representing the end of the event.
      */
     public void setTo(LocalDateTime to) {
+        assert to != null : "New end date/time cannot be null";
+        assert !to.isBefore(from) : "New end date/time cannot be before start date/time";
         this.to = to;
     }
 
@@ -69,6 +79,7 @@ public class Event extends Task {
      */
     @Override
     public String toString() {
+        assert from != null && to != null : "Start and end date/time should not be null when converting to string";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy, h:mm a");
         return "[E]" + super.toString() + " (from: " + from.format(formatter) + " to: " + to.format(formatter) + ")";
     }

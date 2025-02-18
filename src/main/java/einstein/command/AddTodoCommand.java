@@ -20,10 +20,13 @@ public class AddTodoCommand implements Command {
      * @throws EinsteinException If the to-do description is empty.
      */
     public AddTodoCommand(String fullCommand) throws EinsteinException {
+        assert fullCommand != null : "Full command cannot be null";
         this.description = fullCommand.substring(5).trim();
         if (description.isEmpty()) {
+            assert fullCommand.startsWith("todo") : "Command should start with 'todo'";
             throw new EinsteinException("Nein! You have to give a description to your todo.");
         }
+        assert !description.isEmpty() : "Description should not be empty after trimming";
     }
 
     /**
@@ -38,10 +41,18 @@ public class AddTodoCommand implements Command {
      */
     @Override
     public String execute(TaskList tasks, Ui ui, Storage storage) throws EinsteinException {
+        assert tasks != null : "TaskList cannot be null";
+        assert ui != null : "Ui cannot be null";
+        assert storage != null : "Storage cannot be null";
         Task task = new Todo(description);
+        assert task != null : "Created task should not be null";
+        int originalTaskCount = tasks.getTaskCount();
         tasks.addTask(task);
+        assert tasks.getTaskCount() == originalTaskCount + 1 : "Task count should increase by 1";
         storage.save(tasks.getTasks());
-        return ui.showTaskAdded(task, tasks.getTaskCount());
+        String result = ui.showTaskAdded(task, tasks.getTaskCount());
+        assert result != null && !result.isEmpty() : "Result string should not be null or empty";
+        return result;
     }
 
     @Override
