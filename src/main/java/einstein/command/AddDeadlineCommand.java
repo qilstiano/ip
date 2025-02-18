@@ -17,26 +17,10 @@ public class AddDeadlineCommand implements Command {
     private LocalDateTime by;
 
     public AddDeadlineCommand(String fullCommand) throws EinsteinException {
-        String[] parts = parseCommand(fullCommand);
-        validateParts(parts);
-        initializeFields(parts);
-    }
-
-    private String[] parseCommand(String fullCommand) {
-        return fullCommand.substring(9).split("/by", 2);
-    }
-
-    private void validateParts(String[] parts) throws EinsteinException {
-        if (isInvalidFormat(parts)) {
+        String[] parts = fullCommand.substring(9).split("/by", 2);
+        if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
             throw new EinsteinException("Invalid deadline format! Use: deadline <description> /by <date>");
         }
-    }
-
-    private boolean isInvalidFormat(String[] parts) {
-        return parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty();
-    }
-
-    private void initializeFields(String[] parts) throws EinsteinException {
         this.description = parts[0].trim();
         this.by = parseDateTime(parts[1].trim());
     }
