@@ -12,8 +12,9 @@ import einstein.command.ListByDateCommand;
 import einstein.command.ListCommand;
 import einstein.command.MarkCommand;
 import einstein.command.UnmarkCommand;
+import einstein.command.AddTagCommand;
+import einstein.command.RemoveTagCommand;
 import einstein.exception.EinsteinException;
-
 
 /**
  * Parses user input and returns the corresponding command object.
@@ -58,6 +59,10 @@ public class Parser {
             command = new HelpCommand();
         } else if (fullCommand.startsWith("find ")) {
             command = new FindCommand(fullCommand);
+        } else if (fullCommand.startsWith("tag ")) {
+            command = new AddTagCommand(fullCommand);
+        } else if (fullCommand.startsWith("untag ")) {
+            command = new RemoveTagCommand(fullCommand);
         } else {
             throw new EinsteinException("ARGH! I do not understand you, which is weird, "
                     + "\nbecause I usually understand most things. Invalid command!");
@@ -87,7 +92,6 @@ public class Parser {
             throw new EinsteinException("Nein! You must provide at least one task description.");
         }
 
-        assert todos.length > 0 : "There should be at least one todo";
         return new AddMultipleTodosCommand(todos);
     }
 }

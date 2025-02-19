@@ -122,4 +122,26 @@ public class Ui {
         assert !result.isEmpty() : "Tasks by date output should not be null or empty";
         return result;
     }
+
+    /**
+     * Displays a message when a tag is added to a task.
+     *
+     * @param task The task to which the tag was added.
+     * @param tag  The tag that was added.
+     * @return A string containing the message.
+     */
+    public String showTagAdded(Task task, String tag) {
+        return "Tag added: " + tag + " to task " + task;
+    }
+
+    /**
+     * Displays a message when a tag is removed from a task.
+     *
+     * @param task The task from which the tag was removed.
+     * @param tag  The tag that was removed.
+     * @return A string containing the message.
+     */
+    public String showTagRemoved(Task task, String tag) {
+        return "Tag removed: " + tag + " from task " + task;
+    }
 }
