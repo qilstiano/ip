@@ -1,8 +1,3 @@
-Here’s the updated `README.md` with the new **tagging** and **priority** features added, along with the inclusion of the `Ui.png` image in the **Features** section:
-
----
-
-```
          _                   _           _            
         (_)                 / |_        (_)           
  .---.  __   _ .--.   .--. `| |-'.---.  __   _ .--.   
