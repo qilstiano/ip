@@ -6,9 +6,9 @@
 | \\__., | |  | | | |  `'.'. | |,| \\__., | |  | | | |  
  '.__.'[___][___||__][\\__) )\__/ '.__.'[___][___||__]  v1.1
 ```
-# 🧠 Einstein - A Smart Task Management Chatbot 🤖
+# 🧠 Genius Task Management 🤖
 
-Welcome to **Einstein**, your intelligent task management assistant! Einstein is a chatbot designed to help you manage your tasks efficiently. Whether you need to add tasks, mark them as done, or delete them, Einstein is here to make your life easier. With a friendly interface and powerful features, Einstein ensures that you stay organized and productive.
+Guten tag! Welcome to **Einstein**, your intelligent task management assistant! Einstein is a chatbot designed to help you manage your tasks efficiently. Whether you need to add tasks, mark them as done, or delete them, Einstein is here to make your life easier. With a friendly interface and powerful features, Einstein ensures that you stay organized and productive.
 
 ---
 
