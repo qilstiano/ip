@@ -13,8 +13,20 @@ import einstein.exception.EinsteinException;
 import einstein.task.Task;
 import einstein.task.Todo;
 
+/**
+ * Test class for the Storage class.
+ * This class contains unit tests to verify the correct saving and loading of tasks.
+ */
 class StorageTest {
 
+    /**
+     * Tests the save and load functionality of the Storage class.
+     * This test creates a temporary file, saves tasks to it, loads the tasks back,
+     * and verifies that the loaded tasks match the original tasks.
+     *
+     * @throws EinsteinException if there's an error in saving or loading tasks
+     * @throws IOException if there's an error in file operations
+     */
     @Test
     void saveAndLoadTasks_validTasks_tasksSavedAndLoadedSuccessfully() throws EinsteinException, IOException {
         // Create a temporary file for testing
