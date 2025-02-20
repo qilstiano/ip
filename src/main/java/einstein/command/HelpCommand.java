@@ -49,9 +49,12 @@ public class HelpCommand implements Command {
         output.append("   Example: tag 1 fun\n\n");
         output.append("11. untag <task number> <tag> - Remove a tag from a task.\n");
         output.append("   Example: untag 1 fun\n\n");
-        output.append("12. help - Display this help message.\n");
+        output.append("12. priority <task number> <uber_high|high|medium|low> "
+                + "\nSet a priority to a task.\n");
+        output.append("   Example: priority 1 low\n\n");
+        output.append("13. help - Display this help message.\n");
         output.append("   Example: help\n\n");
-        output.append("13. bye - Exit the program.\n");
+        output.append("14. bye - Exit the program.\n");
         output.append("   Example: bye");
 
         return output.toString();

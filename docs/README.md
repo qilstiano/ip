@@ -1,3 +1,7 @@
+Here’s the updated **README.md** with the **Priority Command** added to the **Features** section:
+
+---
+
 ```
          _                   _           _            
         (_)                 / |_        (_)           
@@ -129,7 +133,20 @@ untag <task number> <tag>
 untag 1 fun
 ```
 
-### 8. 🔁 Help
+### 8. 🎯 Set Task Priority
+
+Assign a priority level (`high`, `medium`, `low`) to a task.
+
+**Syntax:**
+```bash
+priority <task number> <high|medium|low>
+```
+**Example:**
+```bash
+priority 1 high
+```
+
+### 9. 🔁 Help
 
 Display a list of all available commands and their usage.
 
@@ -142,7 +159,7 @@ help
 help
 ```
 
-### 9. 🚪 Exit
+### 10. 🚪 Exit
 
 Exit the chatbot.
 
@@ -240,7 +257,7 @@ Nice! I've marked this task as done:
 ```
 ```
 Einstein
-Noted. I've atomized this task:
+Noted. I've removed this task:
   [T][X] read book
 Now you have 0 tasks in the list.
 ```
@@ -253,6 +270,16 @@ Now you have 0 tasks in the list.
 ```
 Einstein
 Tag added: fun to task [T][X] read book #fun
+```
+
+### Setting Task Priority
+
+```bash
+> priority 1 high
+```
+```
+Einstein
+Priority set to HIGH for task: [T][X] read book #fun [Priority: HIGH]
 ```
 
 ### Getting Help
@@ -318,7 +345,7 @@ This project is licensed under the **MIT License**. See the LICENSE file for det
 
 - **DeepSeek:** For providing the gradient text styling and ASCII art as well as for writing this README!
 - **Java:** For making this project possible with its robust and versatile programming language.
-- **Perplexity:** For writing some of the Javadocs in the code when I was short on time. 
+
 ---
 
 Enjoy using Einstein to manage your tasks efficiently! If you have any questions or feedback, feel free to reach out. 🚀
