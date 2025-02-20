@@ -15,6 +15,8 @@ public class Einstein {
     private TaskList tasks;
     private Ui ui;
 
+    private boolean welcomeShown = false;
+
     /**
      * Constructs a new Einstein instance.
      *
@@ -40,13 +42,16 @@ public class Einstein {
      * Continuously reads user input, executes commands, and displays results until exit.
      */
     public void run() {
+        if (!welcomeShown) {
+            welcomeShown = true;
+            ui.showWelcome();
+        }
         boolean isExit = false;
+
         while (!isExit) {
             try {
                 String fullCommand = ui.readCommand();
                 assert fullCommand != null && !fullCommand.isEmpty() : "Command should not be null or empty";
-
-                ui.showLine();
                 Command c = Parser.parse(fullCommand);
 
                 String result = c.execute(tasks, ui, storage);
@@ -55,8 +60,6 @@ public class Einstein {
                 isExit = c.isExit();
             } catch (EinsteinException e) {
                 ui.showError(e.getMessage());
-            } finally {
-                ui.showLine();
             }
         }
     }

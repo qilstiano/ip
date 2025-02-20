@@ -21,7 +21,7 @@ public class Event extends Task {
      */
     public Event(String description, LocalDateTime from, LocalDateTime to) {
         super(description);
-        assert description != null && !description.trim().isEmpty() : "Description cannot be null or empty";
+        assert !description.trim().isEmpty() : "Description cannot be null or empty";
         assert from != null : "Start date/time cannot be null";
         assert to != null : "End date/time cannot be null";
         assert !to.isBefore(from) : "End date/time cannot be before start date/time";

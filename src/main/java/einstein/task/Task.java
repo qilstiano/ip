@@ -3,6 +3,8 @@ package einstein.task;
 import java.util.HashSet;
 import java.util.Set;
 
+import einstein.exception.EinsteinException;
+
 /**
  * Represents a generic task in the Einstein task management system.
  * A Task object corresponds to a task with a description, a status
@@ -101,8 +103,11 @@ public class Task {
      *
      * @param tag The tag to remove.
      */
-    public void removeTag(String tag) {
+    public void removeTag(String tag) throws EinsteinException {
         assert tag != null && !tag.trim().isEmpty() : "Tag cannot be null or empty";
+        if (!tags.contains(tag)) {
+            throw new EinsteinException("Tag does not exist!");
+        }
         tags.remove(tag);
     }
 

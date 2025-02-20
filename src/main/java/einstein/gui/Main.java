@@ -31,6 +31,7 @@ public class Main extends Application {
             stage.setMinWidth(417);
             // stage.setMaxWidth(417); // Add this if you didn't automatically resize elements
             fxmlLoader.<MainWindow>getController().setEinstein(einstein);
+            stage.setTitle("Einstein - Genius Task Manager");
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

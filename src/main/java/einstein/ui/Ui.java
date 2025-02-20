@@ -17,17 +17,18 @@ import einstein.task.Task;
 public class Ui {
 
     /**
+     * Displays the welcome message when the user enters.
+     */
+    public String showWelcome() {
+        return "Guten tag! I'm Einstein, how can I help you today? \n\n"
+                + "Hint: If you need help type 'help'!";
+    }
+
+    /**
      * Displays the farewell message when the user exits.
      */
     public String showFarewell() {
         return "Bye, hope to see you again soon!";
-    }
-
-    /**
-     * Displays a line to separate sections of output.
-     */
-    public String showLine() {
-        return "____________________________________________________________";
     }
 
     /**
@@ -53,7 +54,7 @@ public class Ui {
     /**
      * Displays a message confirming that a task has been added.
      *
-     * @param task The task that was added.
+     * @param task      The task that was added.
      * @param taskCount The total number of tasks in the list after adding the task.
      */
     public String showTaskAdded(Task task, int taskCount) {
@@ -89,7 +90,7 @@ public class Ui {
      * Displays the tasks occurring on a specific date.
      *
      * @param tasks The list of tasks to be checked for the specified date.
-     * @param date The date to filter the tasks by.
+     * @param date  The date to filter the tasks by.
      */
     public String showTasksByDate(ArrayList<Task> tasks, LocalDate date) {
         assert tasks != null : "Task list should not be null";
@@ -100,13 +101,15 @@ public class Ui {
         for (int i = 0; i < tasks.size(); i++) {
             Task task = tasks.get(i);
             assert task != null : "Task in the list should not be null";
-            if (task instanceof Deadline deadline) {
+            if (task instanceof Deadline) {
+                Deadline deadline = (Deadline) task;
                 LocalDateTime time = deadline.getBy();
                 if (time.toLocalDate().equals(date)) {
                     output.append((i + 1)).append(".").append(deadline).append("\n");
                     found = true;
                 }
-            } else if (task instanceof Event event) {
+            } else if (task instanceof Event) {
+                Event event = (Event) task;
                 LocalDateTime from = event.getFrom();
                 LocalDateTime to = event.getTo();
                 if (from.toLocalDate().equals(date) || to.toLocalDate().equals(date)) {

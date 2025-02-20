@@ -38,7 +38,6 @@ public class RemoveTagCommand implements Command {
         if (taskIndex < 0 || taskIndex >= tasks.getTaskCount()) {
             throw new EinsteinException("Invalid task index. Please provide a valid task number.");
         }
-        // Use getTasks().get(index) instead of get(index)
         tasks.getTasks().get(taskIndex).removeTag(tag);
         storage.save(tasks.getTasks());
         return ui.showTagRemoved(tasks.getTasks().get(taskIndex), tag);

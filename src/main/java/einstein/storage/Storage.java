@@ -55,7 +55,6 @@ public class Storage {
         } catch (IOException e) {
             throw new EinsteinException("Error loading tasks from file: " + e.getMessage());
         }
-        assert tasks != null : "Loaded tasks list should not be null";
         return tasks;
     }
 
@@ -87,13 +86,16 @@ public class Storage {
     }
 
     private Task createTask(String type, String description, String[] parts) throws EinsteinException {
-        return switch (type) {
-            case "T" -> new Todo(description);
-            case "D" -> createDeadline(description, parts);
-            case "E" -> createEvent(description, parts);
-            default ->
-                    throw new EinsteinException("Unknown task type found. Skipping line: " + String.join(" | ", parts));
-        };
+        switch (type) {
+        case "T":
+            return new Todo(description);
+        case "D":
+            return createDeadline(description, parts);
+        case "E":
+            return createEvent(description, parts);
+        default:
+            throw new EinsteinException("Unknown task type found. Skipping line: " + String.join(" | ", parts));
+        }
     }
 
     private Task createDeadline(String description, String[] parts) throws EinsteinException {

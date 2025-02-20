@@ -31,8 +31,8 @@ public class MarkCommand implements Command {
     /**
      * Executes the mark command, marking the specified task as done.
      *
-     * @param tasks The current list of tasks.
-     * @param ui The user interface for displaying messages.
+     * @param tasks   The current list of tasks.
+     * @param ui      The user interface for displaying messages.
      * @param storage The storage for saving tasks.
      * @return A string representation of the updated task list.
      * @throws EinsteinException If there's an error in marking the task or saving the updated list.
