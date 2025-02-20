@@ -318,7 +318,7 @@ This project is licensed under the **MIT License**. See the LICENSE file for det
 
 - **DeepSeek:** For providing the gradient text styling and ASCII art as well as for writing this README!
 - **Java:** For making this project possible with its robust and versatile programming language.
-
+- **Perplexity:** For writing some of the Javadocs in the code when I was short on time. 
 ---
 
 Enjoy using Einstein to manage your tasks efficiently! If you have any questions or feedback, feel free to reach out. 🚀
