@@ -1,7 +1,3 @@
-T | 0 | Task1
-T | 0 | Task2
-T | 0 | Task3
-T | 0 | Task4
-T | 0 | Task5
-T | 0 | Task6
-T | 0 | Task7
+T | 1 | change underwear
+D | 0 | wash underwear | 23/10/2025 1900
+E | 0 | underwear competition | 2/11/2025 1400 | 2/11/2025 1800

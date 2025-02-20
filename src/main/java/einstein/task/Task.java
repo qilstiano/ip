@@ -132,6 +132,6 @@ public class Task {
         for (String tag : tags) {
             tagsString.append(" #").append(tag);
         }
-        return "[" + getStatusIcon() + "] " + description + "\n" + tagsString.toString();
+        return "[" + getStatusIcon() + "] " + description + tagsString.toString();
     }
 }
