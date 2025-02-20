@@ -154,6 +154,7 @@ public class Task {
             tagsString.append(" #").append(tag);
         }
         String priorityString = (priority != null) ? " [Priority: " + priority + "]" : "";
+        assert priorityString != null : "Priority String cannot be null!";
         return "[" + getStatusIcon() + "] " + description + tagsString + priorityString;
     }
 }
