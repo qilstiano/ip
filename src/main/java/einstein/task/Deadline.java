@@ -53,8 +53,7 @@ public class Deadline extends Task {
     /**
      * Returns a string representation of the Deadline task.
      *
-     * @return A string that represents the Deadline task, including its description,
-     * status (done or not done), and the due date/time.
+     * @return A string that represents the Deadline task, its description, status and due date/time.
      */
     @Override
     public String toString() {

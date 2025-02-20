@@ -1,12 +1,15 @@
 package einstein.parser;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import einstein.exception.EinsteinException;
-import einstein.command.Command;
-import einstein.command.AddTodoCommand;
+import org.junit.jupiter.api.Test;
+
 import einstein.command.AddDeadlineCommand;
+import einstein.command.AddTodoCommand;
+import einstein.command.Command;
+import einstein.exception.EinsteinException;
+
 class ParserTest {
 
     @Test

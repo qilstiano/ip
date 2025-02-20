@@ -36,6 +36,9 @@ public class DialogBox extends HBox {
 
         dialog.setText(text);
         displayPicture.setImage(img);
+        displayPicture.setFitWidth(65);
+        displayPicture.setFitHeight(65);
+        displayPicture.setPreserveRatio(true);
     }
 
     /**

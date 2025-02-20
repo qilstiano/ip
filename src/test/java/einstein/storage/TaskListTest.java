@@ -1,12 +1,13 @@
 package einstein.storage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
+
 import einstein.exception.EinsteinException;
 import einstein.task.Task;
 import einstein.task.Todo;
-
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-
 class TaskListTest {
 
     @Test

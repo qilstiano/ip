@@ -3,6 +3,7 @@ package einstein.parser;
 import einstein.command.AddDeadlineCommand;
 import einstein.command.AddEventCommand;
 import einstein.command.AddMultipleTodosCommand;
+import einstein.command.AddTagCommand;
 import einstein.command.Command;
 import einstein.command.DeleteCommand;
 import einstein.command.ExitCommand;
@@ -11,9 +12,8 @@ import einstein.command.HelpCommand;
 import einstein.command.ListByDateCommand;
 import einstein.command.ListCommand;
 import einstein.command.MarkCommand;
-import einstein.command.UnmarkCommand;
-import einstein.command.AddTagCommand;
 import einstein.command.RemoveTagCommand;
+import einstein.command.UnmarkCommand;
 import einstein.exception.EinsteinException;
 
 /**

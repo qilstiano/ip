@@ -13,11 +13,13 @@
     -fx-background-radius: 1em 1em 1em 0;
     -fx-border-radius: 1em 1em 1em 0;
     -fx-font: 14px "Microsoft Sans Serif";
+    -fx-background-color: #ff8c42;
+
 }
 
 #displayPicture {
     /* Shadow effect on image. */
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0.5, 5, 5);
+    /*-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0.5, 5, 5);*/
 
     /* Change size of image. */
     -fx-scale-x: 1;

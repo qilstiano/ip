@@ -25,7 +25,7 @@ public class MainWindow extends AnchorPane {
 
     private Einstein einstein;
 
-    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.jpg"));
+    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
     private Image einsteinImage = new Image(this.getClass().getResourceAsStream("/images/DaEinstein.png"));
 
     private Ui ui = new Ui(); // Create a Ui instance to access the welcome message

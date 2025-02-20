@@ -43,10 +43,11 @@ public class AddDeadlineCommand implements Command {
             throw new EinsteinException("Invalid deadline format! Use: deadline <description> /by <date>");
         }
     }
-  
+
     private boolean isInvalidFormat(String[] parts) {
         return parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty();
     }
+
     private void initializeFields(String[] parts) throws EinsteinException {
         this.description = parts[0].trim();
         this.by = parseDateTime(parts[1].trim());
