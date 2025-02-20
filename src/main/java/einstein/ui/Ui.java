@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import einstein.task.Deadline;
 import einstein.task.Event;
+import einstein.task.Priority;
 import einstein.task.Task;
 
 /**
@@ -146,5 +147,16 @@ public class Ui {
      */
     public String showTagRemoved(Task task, String tag) {
         return "Tag removed: " + tag + " from task " + task;
+    }
+
+    /**
+     * Displays a message when the priority of a task is set.
+     *
+     * @param task The task whose priority was set.
+     * @param priority The new priority.
+     * @return A string containing the message.
+     */
+    public String showPrioritySet(Task task, Priority priority) {
+        return "Priority set to " + priority + " for task: " + task;
     }
 }

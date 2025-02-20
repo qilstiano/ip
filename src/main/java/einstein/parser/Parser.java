@@ -13,6 +13,7 @@ import einstein.command.ListByDateCommand;
 import einstein.command.ListCommand;
 import einstein.command.MarkCommand;
 import einstein.command.RemoveTagCommand;
+import einstein.command.SetPriorityCommand;
 import einstein.command.UnmarkCommand;
 import einstein.exception.EinsteinException;
 
@@ -63,6 +64,8 @@ public class Parser {
             command = new AddTagCommand(fullCommand);
         } else if (fullCommand.startsWith("untag ")) {
             command = new RemoveTagCommand(fullCommand);
+        } else if (fullCommand.startsWith("priority ")) {
+            command = new SetPriorityCommand(fullCommand);
         } else {
             throw new EinsteinException("ARGH! I do not understand you, which is weird, "
                     + "\nbecause I usually understand most things. Invalid command!");

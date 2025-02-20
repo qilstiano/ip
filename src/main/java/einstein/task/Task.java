@@ -14,6 +14,8 @@ public class Task {
     private String description;
     private boolean isDone;
     private Set<String> tags;
+    private Priority priority;
+
 
     /**
      * Constructs a Task object with a description. The task is initially marked as not done.
@@ -121,7 +123,26 @@ public class Task {
     }
 
     /**
-     * Returns a string representation of the task, formatted as "[status_icon] description #tags".
+     * Sets the priority of the task.
+     *
+     * @param priority The priority to set.
+     */
+    public void setPriority(Priority priority) {
+        assert priority != null : "Priority cannot be null";
+        this.priority = priority;
+    }
+
+    /**
+     * Gets the priority of the task.
+     *
+     * @return The priority of the task.
+     */
+    public Priority getPriority() {
+        return priority;
+    }
+
+    /**
+     * Returns a string representation of the task, formatted as "[status_icon] description #tags [Priority: priority]".
      * The status icon represents whether the task is done or not.
      *
      * @return A string representation of the task.
@@ -132,6 +153,7 @@ public class Task {
         for (String tag : tags) {
             tagsString.append(" #").append(tag);
         }
-        return "[" + getStatusIcon() + "] " + description + tagsString.toString();
+        String priorityString = (priority != null) ? " [Priority: " + priority + "]" : "";
+        return "[" + getStatusIcon() + "] " + description + tagsString + priorityString;
     }
 }
