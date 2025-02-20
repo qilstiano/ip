@@ -1,3 +1,9 @@
+         _                   _           _            
+        (_)                 / |_        (_)           
+ .---.  __   _ .--.   .--. `| |-'.---.  __   _ .--.   
+/ /__\\[  | [ `.-. | ( (`\\] | | / /__\\[  | [ `.-. |  
+| \\__., | |  | | | |  `'.'. | |,| \\__., | |  | | | |  
+ '.__.'[___][___||__][\\__) )\__/ '.__.'[___][___||__]  v1.1
 # 🧠 Einstein - A Smart Task Management Chatbot 🤖
 
 Welcome to **Einstein**, your intelligent task management assistant! Einstein is a chatbot designed to help you manage your tasks efficiently. Whether you need to add tasks, mark them as done, or delete them, Einstein is here to make your life easier. With a friendly interface and powerful features, Einstein ensures that you stay organized and productive.
@@ -253,24 +259,6 @@ Use: delete <task number>
 Einstein
 Invalid task number! Please give me something valid!
 ```
-
----
-
-## 🎨 Styling and ASCII Art
-
-Einstein's interface is designed to be visually appealing. Here's the ASCII art that greets you when you start the chatbot:
-
-```
-         _                   _           _            
-        (_)                 / |_        (_)           
- .---.  __   _ .--.   .--. `| |-'.---.  __   _ .--.   
-/ /__\\[  | [ `.-. | ( (`\\] | | / /__\\[  | [ `.-. |  
-| \\__., | |  | | | |  `'.'. | |,| \\__., | |  | | | |  
- '.__.'[___][___||__][\\__) )\__/ '.__.'[___][___||__]  v1.0
-```
-
----
-
 ## 🌟 License
 
 This project is licensed under the **MIT License**. See the LICENSE file for details.
