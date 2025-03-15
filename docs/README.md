@@ -1,6 +1,4 @@
-Here’s the updated **README.md** with the **Priority Command** added to the **Features** section:
 
----
 
 ```
          _                   _           _            
